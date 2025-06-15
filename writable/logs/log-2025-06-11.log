@@ -1,0 +1,31 @@
+ERROR - 2025-06-11 05:30:17 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in C:\xampp\htdocs\sistaff\system\Database\MySQLi\Connection.php:184
+Stack trace:
+#0 C:\xampp\htdocs\sistaff\system\Database\MySQLi\Connection.php(184): mysqli->real_connect('localhost', 'root', Object(SensitiveParameterValue), 'sistaff', 3306, '', 0)
+#1 C:\xampp\htdocs\sistaff\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\xampp\htdocs\sistaff\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\xampp\htdocs\sistaff\system\Database\BaseConnection.php(1410): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FRO...')
+#4 C:\xampp\htdocs\sistaff\system\Commands\Database\ShowTableInfo.php(105): CodeIgniter\Database\BaseConnection->listTables()
+#5 C:\xampp\htdocs\sistaff\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\ShowTableInfo->run(Array)
+#6 C:\xampp\htdocs\sistaff\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('db:table', Array)
+#7 C:\xampp\htdocs\sistaff\spark(102): CodeIgniter\CLI\Console->run()
+#8 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in C:\xampp\htdocs\sistaff\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 C:\xampp\htdocs\sistaff\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\xampp\htdocs\sistaff\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\xampp\htdocs\sistaff\system\Database\BaseConnection.php(1410): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FRO...')
+#3 C:\xampp\htdocs\sistaff\system\Commands\Database\ShowTableInfo.php(105): CodeIgniter\Database\BaseConnection->listTables()
+#4 C:\xampp\htdocs\sistaff\system\CLI\Commands.php(65): CodeIgniter\Commands\Database\ShowTableInfo->run(Array)
+#5 C:\xampp\htdocs\sistaff\system\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('db:table', Array)
+#6 C:\xampp\htdocs\sistaff\spark(102): CodeIgniter\CLI\Console->run()
+#7 {main}
+CRITICAL - 2025-06-11 05:30:17 --> Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseConnection.php(1410): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FROM `sistaff`')
+ 3 SYSTEMPATH\Commands\Database\ShowTableInfo.php(105): CodeIgniter\Database\BaseConnection->listTables()
+ 4 SYSTEMPATH\CLI\Commands.php(65): CodeIgniter\Commands\Database\ShowTableInfo->run([])
+ 5 SYSTEMPATH\CLI\Console.php(46): CodeIgniter\CLI\Commands->run('db:table', [])
+ 6 ROOTPATH\spark(102): CodeIgniter\CLI\Console->run()
