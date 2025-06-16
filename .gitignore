@@ -1,0 +1,58 @@
+# =====================================
+# OS-specific files
+# =====================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =====================================
+# Composer dependencies
+# =====================================
+vendor/
+
+# =====================================
+# CI4 writable files (auto-generated)
+# =====================================
+writable/cache/
+writable/debugbar/
+writable/logs/
+writable/session/
+writable/uploads/
+
+# Tetap track file .gitignore di dalam writable/ subfolder
+!writable/cache/.gitignore
+!writable/debugbar/.gitignore
+!writable/logs/.gitignore
+!writable/session/.gitignore
+!writable/uploads/.gitignore
+
+# =====================================
+# Environment settings
+# =====================================
+.env
+.env.*
+
+# =====================================
+# Node/npm (jika pakai frontend tooling)
+# =====================================
+node_modules/
+npm-debug.log
+yarn.lock
+package-lock.json
+
+# =====================================
+# IDE/editor config
+# =====================================
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# =====================================
+# Logs / backup / temp
+# =====================================
+*.log
+*.bak
+*.tmp
+*.swp
+*.swo
