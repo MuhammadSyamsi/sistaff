@@ -60,7 +60,6 @@ $routes->post('/komitmen(:num)', 'Psb::komitmen/$1');
 $routes->post('/closing(:num)', 'Psb::closing/$1');
 $routes->post('/pembayaran', 'Psb::pembayaran');
 
-$routes->resource('api/home', ['controller' => 'Api\Home']);
 $routes->resource('api/kedua', ['controller' => 'Api\Kedua']);
 $routes->resource('api/psb', ['controller' => 'Api\Psb']);
 $routes->resource('api/alumni', ['controller' => 'Api\Alumni']);
