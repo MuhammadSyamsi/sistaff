@@ -1,71 +1,134 @@
 <?= $this->extend('template'); ?>
-
 <?= $this->section('konten'); ?>
-<!-- Messages -->
-<div class="chat-messages" id="chatMessages">
-  <div class="chat-bubble received" id="pembayaran" onclick="goToRoute(this)" data-description="pembayaran">
-    Pembayaran
-    <div class="description">
-      Pembayaran SPP | Daftar Ulang | Infaq | dll<br />
-      <i>tag </i> <span class="badge badge-dark">bayar</span>
-    </div>
+
+<div class="px-4 py-4">
+  
+  <!-- Judul Utama -->
+  <h4 class="text-xl font-semibold mb-4 flex items-center gap-2">
+    <span class="material-symbols-outlined text-blue-600">list_alt</span>
+    Penerimaan Santri Baru
+  </h4>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <?php
+    function badgeStyle($status) {
+      return match (strtolower($status)) {
+        'diterima' => 'bg-green-100 text-green-700',
+        'baru' => 'bg-yellow-100 text-yellow-700',
+        'mengundurkan diri' => 'bg-red-100 text-red-700',
+        default => 'bg-gray-100 text-gray-600'
+      };
+    }
+    ?>
+
+    <?php foreach ($psb as $p): ?>
+      <div class="w-full">
+        <div class="bg-white shadow rounded-xl p-4 h-full">
+
+          <!-- Badge Status -->
+          <h5 class="text-lg font-medium flex items-center gap-2">
+            <span class="px-3 py-1 text-sm rounded-full <?= badgeStyle($p['status']); ?>">
+              <?php
+              echo match (strtolower($p['status'])) {
+                'diterima' => '<span class="material-symbols-outlined text-green-600 align-middle">check_circle</span>',
+                'baru' => '<span class="material-symbols-outlined text-yellow-600 align-middle">schedule</span>',
+                'mengundurkan diri' => '<span class="material-symbols-outlined text-red-600 align-middle">cancel</span>',
+                default => '<span class="material-symbols-outlined text-gray-600 align-middle">info</span>',
+              };
+              ?>
+              <?= ucfirst($p['status']); ?>
+            </span>
+          </h5>
+
+          <!-- Detail -->
+          <ul class="mt-3 space-y-1 text-gray-700">
+            <li><strong>Jumlah:</strong> <?= $p['jumlah']; ?></li>
+            <li><strong>Kewajiban:</strong> <?= format_rupiah($p['kewajiban']); ?></li>
+            <li><strong>Pembayaran:</strong> <?= format_rupiah($p['pembayaran']); ?></li>
+            <li><strong>Tunggakan:</strong> <?= format_rupiah($p['totaltunggakan']); ?></li>
+          </ul>
+
+        </div>
+      </div>
+    <?php endforeach; ?>
   </div>
-  <div class="chat-bubble received" id="tunggakan" onclick="goToRoute(this)" data-description="tunggakan">
-    Tunggakan (Rp <?= format_rupiah($sumtung) ?>,-)
-    <div class="description">
-      Detail Tunggakan dan Tagihan Santri<br />
-      <i>tag </i> <span class="badge badge-dark">tunggakan</span>
+
+  <!-- Grafik PSB -->
+  <?php if (!empty($psb)): ?>
+    <div class="mt-4 border rounded-xl overflow-hidden">
+      <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-100 text-left"
+              data-bs-toggle="collapse" data-bs-target="#collapsePsbChart">
+        <span class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-blue-600">pie_chart</span>
+          Lihat Grafik Penerimaan Santri Baru
+        </span>
+        <span class="material-symbols-outlined">expand_more</span>
+      </button>
+
+      <div id="collapsePsbChart" class="collapse">
+        <div class="p-4 bg-white">
+          <canvas id="chartPsbPie" height="200"></canvas>
+        </div>
+      </div>
     </div>
+  <?php endif; ?>
+
+  <hr class="my-6">
+
+  <!-- Judul Keuangan -->
+  <h4 class="text-xl font-semibold mb-3 flex items-center gap-2">
+    <span class="material-symbols-outlined text-green-600">payments</span>
+    Pemasukan & Ringkasan Tunggakan
+  </h4>
+
+  <div class="bg-white shadow rounded-xl p-4">
+    <p><strong>Pemasukan Bulan Ini:</strong> <?= format_rupiah($jumlah[0]['sum'] ?? 0); ?></p>
+
+    <p class="mt-3 font-semibold">Detail Tunggakan:</p>
+
+    <ul class="mt-1 space-y-1 text-gray-700">
+      <li>Daftar Ulang:</li>
+      <li>- Mandiri: <?= format_rupiah(array_sum(array_column($detailtung, 'tungdu'))); ?></li>
+      <li>- Beasiswa: <?= format_rupiah(array_sum(array_column($detailbea, 'tungdu'))); ?></li>
+
+      <li><strong>Total DU:</strong> 
+        <?= format_rupiah(
+              array_sum(array_column($detailtung, 'tungdu')) + 
+              array_sum(array_column($detailbea, 'tungdu'))
+            ); ?>
+      </li>
+
+      <li><strong>Tahun Lalu:</strong> 
+        <?= format_rupiah(
+              array_sum(array_column($detailtung, 'tungtl')) + 
+              array_sum(array_column($detailbea, 'tungtl'))
+            ); ?>
+      </li>
+
+      <li><strong>SPP:</strong> <?= format_rupiah(array_sum(array_column($detailtung, 'tungspp'))); ?></li>
+    </ul>
   </div>
-  <div class="chat-bubble received" id="santri" onclick="goToRoute(this)" data-description="santri">
-    Data <?php foreach ($santri as $santri): echo ($santri['nisn']);
-          endforeach ?> Santri Darul Hijrah 2 Pasuruan
-    <div class="description">
-      Detail Jumlah dan Data Santri<br />
-      <i>tag </i> <span class="badge badge-dark">santri</span>
+
+  <!-- Grafik Tunggakan -->
+  <?php if (!empty($detailtung)): ?>
+    <div class="mt-4 border rounded-xl overflow-hidden">
+      <button class="w-full flex items-center justify-between px-4 py-3 bg-gray-100 text-left"
+              data-bs-toggle="collapse" data-bs-target="#collapseTunggakanChart">
+        <span class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-purple-600">donut_large</span>
+          Lihat Grafik Tunggakan & Pemasukan
+        </span>
+        <span class="material-symbols-outlined">expand_more</span>
+      </button>
+
+      <div id="collapseTunggakanChart" class="collapse">
+        <div class="p-4 bg-white">
+          <canvas id="chartTunggakanPie" height="200"></canvas>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="chat-bubble received" id="santri-psb" onclick="goToRoute(this)" data-description="santri-psb">
-    Data <?php foreach ($psb as $psb): echo ($psb['nisn']);
-          endforeach ?> Calon Santri Baru
-    <div class="description">
-      Data Santri Inden dan Pendaftar Baru<br />
-      <i>tag </i> <span class="badge badge-dark">psb</span>
-    </div>
-  </div>
-  <div class="chat-bubble received" id="laporan" onclick="goToRoute(this)" data-description="laporan">
-    File Laporan
-    <div class="description">
-      Laporan Dalam Bentuk Chart, Pivot, dan xlsx<br />
-      <i>tag </i> <span class="badge badge-dark">laporan</span>
-    </div>
-  </div>
-  <div class="chat-bubble received" id="berkas-santri" onclick="goToRoute(this)" data-description="berkas-santri">
-    Berkas Santri
-    <div class="description">
-      Berita Acara Pengambilan Berkas Santri<br />
-      <i>tag </i> <span class="badge badge-dark">berkas</span>
-    </div>
-  </div>
-  <div class="chat-bubble received" id="alumni" onclick="goToRoute(this)" data-description="alumni">
-    Data <?php foreach ($alumni as $alumni): echo ($alumni['nisn']);
-          endforeach ?> Alumni dan Santri Keluar
-    <div class="description">
-      Detail Alumni dan Data Santri Keluar<br />
-      <i>tag </i> <span class="badge badge-dark">alumni</span>
-    </div>
-  </div>
-  <div class="chat-bubble received" id="mutasi-pembayaran" onclick="goToRoute(this)" data-description="mutasi-pembayaran">
-    Mutasi
-    <div class="description">
-      Cek Riwayat Pembayaran Santri<br />
-      <i>tag </i> <span class="badge badge-dark">mutasi</span>
-    </div>
-  </div>
-  <div class="pin received">
-    <div class="description">
-      Ketik huruf <span class="badge badge-dark">R</span> untuk memuat ulang halaman ini
-    </div>
-  </div>
+  <?php endif; ?>
+
 </div>
+
 <?= $this->endSection(); ?>

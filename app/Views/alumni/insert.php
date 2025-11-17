@@ -1,190 +1,195 @@
 <?= $this->extend('template'); ?>
-
 <?= $this->section('konten'); ?>
+
 <?php
-
 use App\Models\DetailModel;
-use LDAP\Result;
-
 $TransferModel = new DetailModel();
 $id = $TransferModel->orderBy('id', 'desc')->limit(1)->findColumn('id');
-
 $today = date('Y-m-d');
+$i = ($id && count($id)) ? $id[0] + 1 : 1;
 ?>
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-lg-12 d-flex align-items-stretch">
-      <div class="card w-100">
-        <div class="card-body p-4">
-          <div class="mb-3">
-            <h3 class="card-title fw-semibold">Masukkan Transaksi Baru</h3>
-            <form action="savealumni" method="post">
-              <?= csrf_field(); ?>
-              <?php
-              if ($id == null) {
-                $i = 1;
-              }
-              if ($id != null) {
-                foreach ($id as $a) : $i = $a + 1;
-                endforeach;
-              }
-              ?>
-              <div class="row">
-                <div class="mb-1 col-lg-6">
-                  <input type="hidden" class="form-control" id="id" name="id" value="<?php echo $i; ?>" />
-                  <label for="nisn" class="form-label">Nama</label>
-                  <select class="form-select" id="nisn" name="nisn">
-                    <option selected disabled value=""></option>
-                    <?php foreach ($cari as $c) : ?>
-                      <option value="<?= $c['nisn'] ?>"><?php echo $c['nama'] ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                </div>
-                <div class="mb-1 col-lg-2">
-                  <label for="spp" class="form-label">SPP</label>
-                  <input type="number" disabled class="form-control" id="spp" name="spp" value="0">
-                  <input type="text" hidden class="form-control" id="nama" name="nama" />
-                  <input type="text" hidden class="form-control" id="kelas" name="kelas" />
-                  <input type="text" hidden class="form-control" id="program" name="program" />
-                </div>
-                <div class="mb-1 col-lg-2">
-                  <label for="tunggakantl" class="form-label">TL</label>
-                  <input type="number" disabled class="form-control" id="tunggakantl" name="tunggakantl" value="0">
-                </div>
-                <div class="mb-1 col-lg-2">
-                  <label for="tunggakandu" class="form-label">DU</label>
-                  <input type="number" disabled class="form-control" id="tunggakandu" name="tunggakandu" value="0">
-                </div>
-              </div>
-              <div class="row">
-                <div class="mb-1 col-lg-3">
-                  <label for="saldomasuk" class="form-label">Nominal</label>
-                  <input type="number" class="form-control" id="saldomasuk" name="saldomasuk">
-                </div>
-                <div class="mb-1 col-lg-3">
-                  <label for="tanggal" class="form-label">tanggal</label>
-                  <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?php echo $today; ?>">
-                </div>
-                <div class="mb-1 col-lg-3">
-                  <label for="bukti" class="form-label">bukti</label>
-                  <select type="text" class="form-control" id="bukti" name="bukti">
-                    <option value="ada">Ada</option>
-                    <option value="tidak ada">Tidak Ada</option>
-                  </select>
-                </div>
-                <div class="mb-1 col-lg-3">
-                  <label for="rekening" class="form-label">Rekening</label>
-                  <select type="text" class="form-control" id="bukti" name="rekening">
-                    <option value="Muamalat Salam">Muamalat Salam</option>
-                    <option value="Jatim Syariah">Jatim Syariah</option>
-                    <option value="BSI">BSI</option>
-                    <option value="Uang Saku">Uang Saku</option>
-                    <option value="Muamalat Yatim">Muamalat Yatim</option>
-                    <option value="Tunai">Tunai</option>
-                    <option value="lain-lain">Lain-lain</option>
-                  </select>
-                </div>
-                <div class="mb-1">
-                  <label for="ketarangan" class="form-label">Keterangan</label>
-                  <input type="text" class="form-control" id="keterangan" name="keterangan">
-                </div>
-              </div>
-              <div class="mb-1 col-lg-12">
-                <label for="rekening" class="form-label">Transaksi Terakhir</label>
-              </div>
-              <div class="row mb-4">
-                <div class="col-lg-2" id="lasttanggal1" name="lasttanggal1" disabled></div>
-                <div class="col-lg-2" id="lastrek1" name="lastrek1" disabled></div>
-                <div class="col-lg-2" id="lastnom1" name="lastnom1" disabled></div>
-                <div class="col-lg-6" id="lastket1" name="lastket1" disabled></div>
-                <div class="col-lg-2" id="lasttanggal2" name="lasttanggal2" disabled></div>
-                <div class="col-lg-2" id="lastrek2" name="lastrek2" disabled></div>
-                <div class="col-lg-2" id="lastnom2" name="lastnom2" disabled></div>
-                <div class="col-lg-6" id="lastket2" name="lastket2" disabled></div>
-                <div class="col-lg-2" id="lasttanggal3" name="lasttanggal3" disabled></div>
-                <div class="col-lg-2" id="lastrek3" name="lastrek3" disabled></div>
-                <div class="col-lg-2" id="lastnom3" name="lastnom3" disabled></div>
-                <div class="col-lg-6" id="lastket3" name="lastket3" disabled></div>
-              </div>
-              <h4 class="card-title fw-semibold">Detail Pemasukan</h4>
-              <div class="row">
-                <div class="mb-1 col-lg-4">
-                  <label for="tunggakandu" class="form-label">Bayar Daftar Ulang</label>
-                  <input type="number" class="form-control" id="tunggakandu" name="tunggakandu" value="0">
-                </div>
-                <div class="mb-1 col-lg-4">
-                  <label for="tunggakantl" class="form-label">Bayar Tunggakan</label>
-                  <input type="number" class="form-control" id="tunggakantl" name="tunggakantl" value="0">
-                </div>
-                <div class="mb-1 col-lg-4">
-                  <label for="tunggakanspp" class="form-label">Bayar SPP</label>
-                  <input type="number" class="form-control" id="tunggakanspp" name="tunggakanspp" value="0">
-                </div>
-                <div class="mb-1 col-lg-4">
-                  <label for="uangsaku" class="form-label">Uang Saku</label>
-                  <input type="number" class="form-control" id="uangsaku" name="uangsaku" value="0">
-                </div>
-                <div class="mb-1 col-lg-4">
-                  <label for="infaq" class="form-label">Infaq</label>
-                  <input type="number" class="form-control" id="infaq" name="infaq" value="0">
-                </div>
-                <div class="mb-4 col-lg-4">
-                  <label for="formulir" class="form-label">Formulir</label>
-                  <input type="number" class="form-control" id="formulir" name="formulir" value="0">
-                </div>
-              </div>
-              <button type="submit" class="btn btn-dark m-1">Buat Kwitansi</button>
-            </form>
-          </div>
+
+<div class="container mx-auto p-4">
+  <div class="bg-white shadow rounded-lg p-6">
+    <h2 class="text-2xl font-semibold mb-6 flex items-center">
+      <span class="material-symbols-outlined mr-2">account_balance_wallet</span>
+      Pembayaran Tunggakan Alumni
+    </h2>
+
+    <form action="<?= base_url('savealumni') ?>" method="post" x-data="alumniForm()" @submit.prevent="submitForm">
+      <?= csrf_field(); ?>
+      <input type="hidden" name="id" value="<?= $i ?>">
+      <input type="hidden" name="nama" x-model="nama">
+      <input type="hidden" name="kelas" x-model="kelas">
+      <input type="hidden" name="program" x-model="program">
+
+      <!-- Identitas -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nama Santri</label>
+          <select class="w-full border rounded px-3 py-2" x-model="nisn" @change="loadData">
+            <option value="">- Pilih Nama -</option>
+            <?php foreach ($cari as $c): ?>
+              <option value="<?= $c['nisn'] ?>"><?= $c['nama'] ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Tanggal Pembayaran</label>
+          <input type="date" class="w-full border rounded px-3 py-2" name="tanggal" value="<?= $today ?>" required>
         </div>
       </div>
-    </div>
+
+      <!-- Tunggakan -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium mb-1">Tunggakan SPP</label>
+          <input type="number" class="w-full border rounded px-3 py-2 bg-gray-100" x-model="tunggakanspp" disabled>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Tunggakan TL</label>
+          <input type="number" class="w-full border rounded px-3 py-2 bg-gray-100" x-model="tunggakantl" disabled>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Tunggakan DU</label>
+          <input type="number" class="w-full border rounded px-3 py-2 bg-gray-100" x-model="tunggakandu" disabled>
+        </div>
+      </div>
+
+      <!-- Pembayaran -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nominal Pembayaran</label>
+          <input type="number" class="w-full border rounded px-3 py-2" name="saldomasuk" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Rekening</label>
+          <select class="w-full border rounded px-3 py-2" name="rekening" required>
+            <option value="" selected disabled>- Pilih Rekening -</option>
+            <option value="Muamalat Salam">Muamalat Salam</option>
+            <option value="Jatim Syariah">Jatim Syariah</option>
+            <option value="BSI">BSI</option>
+            <option value="Uang Saku">Uang Saku</option>
+            <option value="Muamalat Yatim">Muamalat Yatim</option>
+            <option value="Tunai">Tunai</option>
+            <option value="lain-lain">Lain-lain</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Keterangan</label>
+          <input type="text" class="w-full border rounded px-3 py-2" name="keterangan">
+        </div>
+      </div>
+
+      <!-- Detail Pemasukan -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium mb-1">Bayar Daftar Ulang</label>
+          <input type="number" class="w-full border rounded px-3 py-2" name="tunggakandu" value="0">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Bayar Tunggakan TL</label>
+          <input type="number" class="w-full border rounded px-3 py-2" name="tunggakantl" value="0">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Bayar SPP</label>
+          <input type="number" class="w-full border rounded px-3 py-2" name="tunggakanspp" value="0">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Uang Saku</label>
+          <input type="number" class="w-full border rounded px-3 py-2" name="uangsaku" value="0">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Infaq</label>
+          <input type="number" class="w-full border rounded px-3 py-2" name="infaq" value="0">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Formulir</label>
+          <input type="number" class="w-full border rounded px-3 py-2" name="formulir" value="0">
+        </div>
+      </div>
+
+      <!-- Riwayat Transaksi -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold mb-2">Riwayat Transaksi Terakhir</label>
+        <ul class="border rounded divide-y divide-gray-200" x-ref="riwayatList">
+          <li class="px-4 py-2 text-gray-500">Belum ada transaksi.</li>
+        </ul>
+      </div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white rounded py-2 font-semibold flex justify-center items-center gap-2 hover:bg-blue-700">
+        <span class="material-symbols-outlined">print</span> Buat Kwitansi
+      </button>
+    </form>
   </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script src="assets/dist/js/select2.min.js"></script>
 <script>
-  $('#nisn').select2({
-    placeholder: "Nama Santri"
-  });
+function alumniForm() {
+  return {
+    nisn: '',
+    nama: '',
+    kelas: '',
+    program: '',
+    tunggakanspp: 0,
+    tunggakantl: 0,
+    tunggakandu: 0,
+    riwayat: [],
+    
+    async loadData() {
+      if(!this.nisn) return;
 
-  $('#nisn').on('change', (event) => {
-    getIdentitas(event.target.value).then(AlumniModel => {
-      $('#nama').val(AlumniModel.nama);
-      $('#kelas').val(AlumniModel.kelas);
-      $('#spp').val(AlumniModel.tunggakanspp);
-      $('#tunggakantl').val(AlumniModel.tunggakantl);
-      $('#tunggakandu').val(AlumniModel.tunggakandu);
-      $('#program').val(AlumniModel.program);
-    });
-    getTransaksi(event.target.value).then(TransferModel => {
-      $('#lasttanggal1').text(TransferModel.tanggal1);
-      $('#lastket1').text(TransferModel.keterangan1);
-      $('#lastrek1').text(TransferModel.rekening1);
-      $('#lastnom1').text(TransferModel.nominal1);
-      $('#lasttanggal2').text(TransferModel.tanggal2);
-      $('#lastket2').text(TransferModel.keterangan2);
-      $('#lastrek2').text(TransferModel.rekening2);
-      $('#lastnom2').text(TransferModel.nominal2);
-      $('#lasttanggal3').text(TransferModel.tanggal3);
-      $('#lastket3').text(TransferModel.keterangan3);
-      $('#lastrek3').text(TransferModel.rekening3);
-      $('#lastnom3').text(TransferModel.nominal3);
-    });
-  });
+      // Ambil identitas
+      const resIdentitas = await fetch(`<?= base_url('api/alumni/') ?>${this.nisn}`);
+      const data = await resIdentitas.json();
+      this.nama = data.nama;
+      this.kelas = data.kelas;
+      this.program = data.program;
+      this.tunggakanspp = data.tunggakanspp ?? 0;
+      this.tunggakantl = data.tunggakantl ?? 0;
+      this.tunggakandu = data.tunggakandu ?? 0;
 
-  async function getIdentitas(id) {
-    let response = await fetch('api/alumni/' + id)
-    let data = await response.json();
+      // Ambil riwayat
+      const resTrans = await fetch(`<?= base_url('api/kedua/') ?>${this.nisn}`);
+      this.riwayat = await resTrans.json();
+      this.renderRiwayat();
+    },
 
-    return data;
+    renderRiwayat() {
+      const list = this.$refs.riwayatList;
+      list.innerHTML = '';
+      if(this.riwayat.length === 0) {
+        list.innerHTML = '<li class="px-4 py-2 text-gray-500">Belum ada transaksi.</li>';
+      } else {
+        this.riwayat.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'px-4 py-2 flex justify-between items-center';
+          li.innerHTML = `
+            <div>
+              <strong>${item.tanggal ?? '-'}</strong><br>
+              <small>${item.keterangan ?? '-'}</small>
+            </div>
+            <div class="text-right">
+              <span class="text-gray-500">${item.rekening}</span><br>
+              <strong>${this.formatRupiah(item.nominal)}</strong>
+            </div>
+          `;
+          list.appendChild(li);
+        });
+      }
+    },
+
+    formatRupiah(value) {
+      if(!value) return 'Rp0';
+      return 'Rp' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
+
+    submitForm() {
+      this.$el.submit();
+    }
   }
-  async function getTransaksi(id) {
-    let response = await fetch('api/kedua/' + id)
-    let data = await response.json();
-    return data;
-  }
+}
 </script>
 
 <?= $this->endSection(); ?>

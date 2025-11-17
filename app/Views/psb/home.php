@@ -2,15 +2,6 @@
 
 <?= $this->section('konten'); ?>
 <div class="container-fluid">
-  <!-----------navbar----------->
-  <div class="row">
-    <div class="col-lg-12 d-flex align-items-stretch mb-2">
-      <a href="tambahpsb" type="button" class="btn btn-info me-2">Daftar Baru</a>
-      <a href="pembayaran" type="button" class="btn btn-secondary me-2">Pembayaran</a>
-      <a href="downloadpsb" type="button" class="btn btn-success me-2">Downlaad Laporan</a>
-    </div>
-  </div>
-  <hr />
   <!-- /// -->
   <div class="row">
     <div class="col-lg-3 d-flex align-items-stretch mb-2">

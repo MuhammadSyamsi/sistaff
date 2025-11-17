@@ -1,117 +1,229 @@
 <?= $this->extend('template'); ?>
-
 <?= $this->section('konten'); ?>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-12 d-flex align-items-stretch">
-            <div class="card w-100">
-                <div class="card-body p-4">
-                    <div class="mb-3">
-                        <?php foreach ($edit as $c) : ?>
-                            <h3 class="card-title fw-semibold">Edit Transaksi <?= $c['nama']; ?></h3>
-                            <form action="edit" method="post">
-                                <?= csrf_field(); ?>
-                                <div class="row">
-                                    <div class="mb-1 col-lg-12">
-                                        <label for="ketarangan" class="form-label">Keterangan</label>
-                                        <input type="text" class="form-control" id="keterangan" name="keterangan" value="<?= $c['keterangan'] ?>">
-                                        <input type="text" hidden id="nama" name="nama" value="<?= $c['nama']; ?>" />
-                                        <input type="text" hidden id="idtrans" name="idtrans" value="<?= $c['idtrans']; ?>" />
-                                        <input type="text" hidden id="nisn" name="nisn" value="<?= $c['nisn']; ?>" />
-                                        <input type="text" hidden id="kelas" name="kelas" value="<?= $c['kelas']; ?>" />
-                                    </div>
-                                    <div class="mb-1 col-lg-2">
-                                        <label for="bukti" class="form-label">Bukti</label>
-                                        <select type="text" class="form-control" id="bukti" name="bukti">
-                                            <option value="<?= $c['bukti'] ?>"><?= $c['bukti'] ?></option>
-                                            <option value="ada">ada</option>
-                                            <option value="tidak ada">tidak ada</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-1 col-lg-4">
-                                        <label for="saldomasuk" class="form-label">Saldo Masuk</label>
-                                        <input type="number" class="form-control" id="saldomasuk" name="saldomasuk" value="<?= $c['saldomasuk']; ?>">
-                                    </div>
-                                    <div class="mb-1 col-lg-3">
-                                        <label for="tanggal" class="form-label">tanggal</label>
-                                        <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= $c['tanggal'] ?>">
-                                    </div>
-                                    <div class="mb-4 col-lg-3">
-                                        <label for="rekening" class="form-label">Rekening</label>
-                                        <select type="text" class="form-control" id="rekening" name="rekening">
-                                            <option value="<?= $c['rekening'] ?>"><?= $c['rekening'] ?></option>
-                                            <option value="Muamalat Salam">Muamalat Salam</option>
-                                            <option value="Jatim Syariah">Jatim Syariah</option>
-                                            <option value="BSI">BSI</option>
-                                            <option value="Uang Saku">Uang Saku</option>
-                                            <option value="Muamalat Yatim">Muamalat Yatim</option>
-                                            <option value="Tunai">Tunai</option>
-                                            <option value="lain-lain">Lain-lain</option>
-                                        </select>
-                                    </div>
-                                <?php endforeach; ?>
-                                </div>
-                                <div class="mb-1">
-                                    <h5 class="card-title fw-semibold">Edit Tunggakan</h5>
-                                </div>
-                                <div class="row">
-                                    <?php foreach ($santri as $s) : ?>
-                                        <div class="mb-1 col-lg-4">
-                                            <label for="nama" class="form-label">Daftar Ulang</label>
-                                            <input type="text" class="form-control" id="santridu" name="santridu" value="<?= $s['tunggakandu']; ?>" />
-                                        </div>
-                                        <div class="mb-1 col-lg-4">
-                                            <label for="nama" class="form-label">Tunggakan</label>
-                                            <input type="text" class="form-control" id="santritl" name="santritl" value="<?= $s['tunggakantl']; ?>" />
-                                        </div>
-                                        <div class="mb-1 col-lg-4">
-                                            <label for="nama" class="form-label">Tunggakan SPP</label>
-                                            <input type="text" class="form-control" id="santrispp" name="santrispp" value="<?= $s['tunggakanspp']; ?>" />
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                                <hr />
-                                <div class="mb-1">
-                                    <h5 class="card-title fw-semibold">Detail Transaksi</h5>
-                                </div>
-                                <div class="row">
-                                    <?php foreach ($detail as $d) : ?>
-                                        <div class="mb-1 col-lg-4">
-                                            <label for="nama" class="form-label">Bayar Daftar Ulang</label>
-                                            <input type="text" class="form-control" id="du" name="du" value="<?= $d['daftarulang']; ?>" />
-                                        </div>
-                                        <div class="mb-1 col-lg-4">
-                                            <label for="nama" class="form-label">Bayar Tunggakan</label>
-                                            <input type="text" class="form-control" id="tunggakan" name="tunggakan" value="<?= $d['tunggakan']; ?>" />
-                                        </div>
-                                        <div class="mb-1 col-lg-4">
-                                            <label for="nama" class="form-label">Bayar SPP</label>
-                                            <input type="text" class="form-control" id="spp" name="spp" value="<?= $d['spp']; ?>" />
-                                        </div>
-                                        <div class="mb-1 col-lg-4">
-                                            <label for="nama" class="form-label">Bayar Uang Saku</label>
-                                            <input type="text" class="form-control" id="uangsaku" name="uangsaku" value="<?= $d['uangsaku']; ?>" />
-                                        </div>
-                                        <div class="mb-1 col-lg-4">
-                                            <label for="nama" class="form-label">Infaq</label>
-                                            <input type="text" class="form-control" id="infaq" name="infaq" value="<?= $d['infaq']; ?>" />
-                                        </div>
-                                        <div class="mb-1 col-lg-4">
-                                            <label for="nama" class="form-label">Formulir</label>
-                                            <input type="text" class="form-control" id="formulir" name="formulir" value="<?= $d['formulir']; ?>" />
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                                <div class="card-body p-4">
-                                    <button type="submit" class="btn btn-success m-1">Simpan</button>
-                                    <a type="button" class="btn btn-warning m-1" href="./mutasi">Kembali</a>
-                                </div>
-                            </form>
+<div class="w-full pb-20">
+    <div class="flex justify-center">
+        <div class="w-full lg:w-10/12">
+
+            <div class="backdrop-blur-md bg-white/50 shadow-md rounded-2xl p-5 mt-4 border border-white/30">
+                <?php foreach ($edit as $c) : ?>
+
+                <!-- Header -->
+                <h2 class="text-xl font-bold text-slate-700 flex items-center gap-2 mb-1">
+                    <span class="material-symbols-outlined">edit</span>
+                    Edit Transaksi
+                </h2>
+                <p class="text-sm text-slate-500 mb-5"><?= $c['nama']; ?></p>
+                
+                <form x-data="rupiahFormatter" action="<?= base_url('edit'); ?>" method="post" class="space-y-6">
+                        <?= csrf_field(); ?>
+
+                    <!-- INPUT UTAMA -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="text-xs text-slate-600">Saldo Masuk</label>
+                            <input type="text" name="saldomasuk" value="<?= $c['saldomasuk']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-sm focus:ring-2 focus:ring-blue-400 outline-none" required>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-600">Tanggal</label>
+                            <input type="date" name="tanggal" value="<?= $c['tanggal']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-sm focus:ring-2 focus:ring-blue-400 outline-none" required>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-600">Rekening</label>
+                            <select name="rekening"
+                                class="mt-1 w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                                <option selected><?= $c['rekening']; ?></option>
+                                <option>Muamalat Salam</option>
+                                <option>Jatim Syariah</option>
+                                <option>BSI</option>
+                                <option>Uang Saku</option>
+                                <option>Muamalat Yatim</option>
+                                <option>Tunai</option>
+                                <option>Lain-lain</option>
+                            </select>
+                        </div>
+                        <input type="text" name="keterangan" value="<?= $c['keterangan']; ?>">
+
+
+                        <!-- Hidden -->
+                        <input type="hidden" name="nama" value="<?= $c['nama']; ?>">
+                        <input type="hidden" name="idtrans" value="<?= $c['idtrans']; ?>">
+                        <input type="hidden" name="nisn" value="<?= $c['nisn']; ?>">
+                        <input type="hidden" name="kelas" value="<?= $c['kelas']; ?>">
+                    </div>
+                <?php endforeach; ?>
+
+                <!-- TUNGGAKAN -->
+                <div class="border-t pt-6">
+                    <h3 class="flex items-center gap-2 font-semibold text-slate-700 mb-3">
+                        <span class="material-symbols-outlined">warning</span>
+                        Edit Tunggakan
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <?php foreach ($santri as $s) : ?>
+                        <div>
+                            <label class="text-xs text-slate-600">Tunggakan Daftar Ulang</label>
+                            <input type="text" name="santridu" value="<?= $s['tunggakandu']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-sm focus:ring-2 focus:ring-blue-400 outline-none" required>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-600">Tunggakan Lain-lain</label>
+                            <input type="text" name="santritl" value="<?= $s['tunggakantl']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-sm focus:ring-2 focus:ring-blue-400 outline-none" required>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-600">Tunggakan SPP</label>
+                            <input type="text" name="santrispp" value="<?= $s['tunggakanspp']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-sm focus:ring-2 focus:ring-blue-400 outline-none" required>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
+
+                <!-- DETAIL PEMBAYARAN -->
+                <div class="border-t pt-6">
+                    <h3 class="flex items-center gap-2 font-semibold text-slate-700 mb-3">
+                        <span class="material-symbols-outlined">credit_card</span>
+                        Detail Pembayaran
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <?php foreach ($detail as $d) : ?>
+
+                        <div>
+                            <label class="text-xs text-slate-600">Bayar Daftar Ulang</label>
+                            <input type="text" name="du" value="<?= $d['daftarulang']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-blue-400" required>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-600">Bayar Tunggakan</label>
+                            <input type="text" name="tunggakan" value="<?= $d['tunggakan']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-blue-400" required>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-600">Bayar SPP</label>
+                            <input type="text" name="spp" value="<?= $d['spp']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-blue-400" required>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-600">Uang Saku</label>
+                            <input type="text" name="uangsaku" value="<?= $d['uangsaku']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-blue-400" required>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-600">Infaq</label>
+                            <input type="text" name="infaq" value="<?= $d['infaq']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-blue-400" required>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-600">Formulir</label>
+                            <input type="text" name="formulir" value="<?= $d['formulir']; ?>"
+                                class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-blue-400" required>
+                        </div>
+
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <!-- STICKY BUTTON -->
+                <div class="fixed bottom-0 left-0 right-0 bg-white border-t py-3 px-5 flex justify-between items-center z-50">
+                    <a href="<?= base_url('riwayat-pembayaran'); ?>"
+                       class="px-5 py-2 rounded-xl border border-amber-500 text-amber-600 text-sm font-medium flex items-center gap-2">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        Kembali
+                    </a>
+
+                    <button type="submit"
+                        class="px-6 py-2 rounded-xl bg-green-600 text-white text-sm font-medium flex items-center gap-2 shadow">
+                        <span class="material-symbols-outlined">save</span>
+                        Simpan
+                    </button>
+                </div>
+
+                </form>
             </div>
+
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+
+  Alpine.data('rupiahFormatter', () => ({
+    numericFields: [
+      'saldomasuk','santridu','santrispp','santritl',
+      'du','tunggakan','spp','uangsaku','infaq','formulir'
+    ],
+
+    formatRibuan(value) {
+      if (!value) return '';
+      return value.toString()
+        .replace(/[^0-9]/g, '')
+        .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    },
+
+    init() {
+
+      // *** FORMAT SAAT HALAMAN PERTAMA KALI LOAD ***
+      this.numericFields.forEach(name => {
+        const el = document.querySelector(`input[name="${name}"]`) || document.getElementById(name);
+        if (!el) return;
+
+        const raw = el.value.toString().replace(/\D/g, '');
+        el.value = this.formatRibuan(raw);
+
+        // Set input mode mobile numeric
+        el.setAttribute('inputmode', 'numeric');
+
+        // Auto-format saat mengetik
+        el.addEventListener('input', () => {
+          const before = el.value;
+          const caretBefore = el.selectionStart ?? before.length;
+
+          const digits = before.replace(/\D/g, '');
+          el.value = this.formatRibuan(digits);
+
+          // Koreksi caret
+          const digitsBefore = before.slice(0, caretBefore).replace(/\D/g, '').length;
+
+          let pos = 0, count = 0;
+          for (let i = 0; i < el.value.length; i++) {
+            if (/\d/.test(el.value[i])) count++;
+            pos++;
+            if (count >= digitsBefore) break;
+          }
+          el.setSelectionRange(pos, pos);
+        });
+      });
+
+      // *** HAPUS FORMAT SAAT SUBMIT ***
+      const form = this.$root?.closest('form') || document.querySelector('form');
+      if (form) {
+        form.addEventListener('submit', () => {
+          this.numericFields.forEach(name => {
+            const el = document.querySelector(`input[name="${name}"]`) || document.getElementById(name);
+            if (el) el.value = el.value.replace(/\./g, '');
+          });
+        });
+      }
+
+    }
+  }));
+
+});
+</script>
+
 <?= $this->endSection(); ?>

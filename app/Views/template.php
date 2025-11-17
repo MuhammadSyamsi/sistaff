@@ -1,230 +1,240 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" x-data="{ openSantri:false, openKeuangan:false, openPembayaran:false, openGuru:false }">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Sistaff</title>
-  <link rel="shortcut icon" type="image/png" href="assets/images/logos/dh.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Bootstrap 4 CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SISTAFF</title>
+      <link rel="shortcut icon" type="image/png" href="assets/images/logos/dh.png" />
 
-    .chat-box {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      max-width: 100%;
-    }
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    .chat-header {
-      background-color: #075E54;
-      color: white;
-      padding: 15px;
-      font-size: 1.25rem;
-      font-weight: bold;
-      border-bottom: 1px solid #ddd;
-    }
+    <!-- Alpine JS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    .chat-header a {
-      color: white;
-      text-decoration: none;
-    }
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+          rel="stylesheet" />
 
-    .chat-messages {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      background-color: #e5ddd5;
-      display: flex;
-      flex-direction: column;
-    }
+    <!-- Galaxy Tab A9 optimization -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/mobile-a9.css'); ?>">
+    
+    <!-- jQuery + Select2 (keperluan select Ajax) -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    /* Bubble umum */
-    .chat-bubble {
-      max-width: 70%;
-      padding: 10px 15px;
-      margin-bottom: 10px;
-      border-radius: 10px;
-      word-wrap: break-word;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    /* Pesan yang dikirim user */
-    .sent {
-      background-color: #dcf8c6;
-      align-self: flex-end;
-    }
-
-    /* Pesan yang diterima system-message, pin, received*/
-    .system-message {
-      text-align: center;
-      background-color: #e1f3fb;
-      /* Biru muda atau abu */
-      color: #4a4a4a;
-      font-size: 12px;
-      padding: 6px 12px;
-      margin: 15px auto;
-      border-radius: 10px;
-      max-width: 70%;
-      font-style: italic;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .pin {
-      max-width: 70%;
-      padding: 10px 15px;
-      margin-bottom: 10px;
-      border-radius: 10px;
-      word-wrap: break-word;
-    }
-
-    .received {
-      background-color: #fff;
-      align-self: flex-start;
-      border: 1px solid #ddd;
-    }
-
-    .message:hover {
-      background-color: #cdebb5;
-    }
-
-    .description {
-      font-size: 0.75rem;
-      color: #555;
-    }
-
-    .chat-footer {
-      background-color: #f1f1f1;
-      padding: 10px;
-      border-top: 1px solid #ddd;
-    }
-  </style>
 </head>
 
-<body>
+<body class="bg-gray-100">
 
-  <div class="container-fluid p-0">
-    <div class="chat-box">
+<!-- Top Navbar -->
+<nav class="fixed top-0 left-0 right-0 bg-white shadow border-b z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 
-      <!-- Header -->
-      <?php
+        <a href="<?= base_url() ?>" class="text-green-600 text-xl font-bold">
+            SISTAFF
+        </a>
 
-      use CodeIgniter\HTTP\URI;
+        <div class="flex items-center gap-4">
+            <div>
+                <p class="text-blue-600 text-sm font-semibold">Assalamu'alaikum</p>
+                <p class="text-sm">Ustadz <?= ucfirst(user()->username ?? 'Nama') ?></p>
+            </div>
+
+            <!-- Dropdown Settings -->
+            <div x-data="{open:false}" class="relative">
+                <button @click="open=!open"
+                    class="p-2 border rounded-lg hover:bg-gray-100">
+                    <span class="material-symbols-outlined w-6 h-6 text-gray-600">settings</span>
+                </button>
+
+                <div x-show="open" @click.away="open=false"
+                     class="absolute right-0 mt-2 w-44 bg-white shadow-lg rounded-lg p-2 z-50">
+                    <h6 class="px-3 py-2 text-gray-500 text-xs">Menu</h6>
+
+                    <a href="<?= base_url('kantin') ?>" class="block px-3 py-2 text-sm hover:bg-gray-100">
+                        Tools
+                    </a>
+
+                    <a href="<?= base_url('tentang') ?>" class="block px-3 py-2 text-sm hover:bg-gray-100">
+                        Tentang
+                    </a>
+
+                    <hr class="my-1">
+
+                    <a href="<?= base_url('logout') ?>"
+                       class="block px-3 py-2 text-sm text-red-600 hover:bg-gray-100">
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
 
 
-      $uri = service('uri');
-      $segments = $uri->getSegments();
-      ?>
+<!-- Wrapper -->
+<div class="pt-20 pb-20 max-w-7xl mx-auto px-4">
 
-      <div class="chat-header" id="chatHeader">
-        <a href="<?= base_url() ?>" class="text-white text-decoration-none">Sistaff</a>
-        <?php foreach ($segments as $segment): ?>
-          &nbsp;&gt;&nbsp;<?= ucwords(str_replace('-', ' ', esc($segment))) ?>
-        <?php endforeach; ?>
-      </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-      <?= $this->renderSection('konten'); ?>
-
-      <!-- Footer (Filter) -->
-      <div class="chat-footer d-flex">
-        <input type="text" class="form-control mr-2" id="filterInput" placeholder="Tuliskan Sesuatu" autocomplete="off" onkeypress="if(event.key==='Enter') filterMessages()">
-        <button class="btn btn-primary" onclick="filterMessages()">Kirim</button>
-      </div>
+        <!-- Main Content -->
+        <main class="col-span-1 md:col-span-3">
+            <?= $this->renderSection('konten'); ?>
+        </main>
 
     </div>
-  </div>
+</div>
 
-  <!-- JS -->
-  <script>
-    // agar selalu fokus di chat input
-    // document.getElementById("filterInput").focus();
-    const baseUrl = "<?= base_url() ?>";
 
-    function goToRoute(element) {
-      const route = element.id;
 
-      // Ubah header
-      window.location.href = `${baseUrl}${route}`;
-    }
+<!-- BOTTOM NAV (Mobile) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-2 flex justify-around z-50">
 
-    function filterMessages() {
-      // Cek apakah ada fungsi lokal di halaman yang override filterMessages
-      if (typeof customFilterMessages === 'function') {
-        return customFilterMessages(); // pakai fungsi lokal halaman ini
-      }
+    <!-- Santri -->
+    <div x-data="{open:false}" class="relative">
+        <button @click="open=!open" class="text-center">
+            <span class="material-symbols-outlined w-6 h-6 mx-auto">group</span>
+            <div class="text-xs">Santri</div>
+        </button>
 
-      // Default behavior (dari template utama)
-      const filter = document.getElementById("filterInput").value.trim().toLowerCase();
-      if (filter === "") return; // Tidak melakukan apapun
-      if (filter === "r") {
-        window.location.href = window.location.origin + "/sistaff/public";
-        return;
-      }
-      if (filter === "bayar") {
-        window.location.href = window.location.origin + "/sistaff/public/pembayaran";
-        return;
-      }
-      if (filter === "tunggakan") {
-        window.location.href = window.location.origin + "/sistaff/public/tunggakan";
-        return;
-      }
-      if (filter === "santri") {
-        window.location.href = window.location.origin + "/sistaff/public/santri";
-        return;
-      }
-      if (filter === "psb") {
-        window.location.href = window.location.origin + "/sistaff/public/psb";
-        return;
-      }
-      if (filter === "laporan") {
-        window.location.href = window.location.origin + "/sistaff/public/laporan";
-        return;
-      }
-      if (filter === "berkas") {
-        window.location.href = window.location.origin + "/sistaff/public/berkas";
-        return;
-      }
-      if (filter === "alumni") {
-        window.location.href = window.location.origin + "/sistaff/public/alumni";
-        return;
-      }
-      if (filter === "mutasi") {
-        window.location.href = window.location.origin + "/sistaff/public/mutasi";
-        return;
-      }
-      const chatBox = document.getElementById("chatMessages");
-      const messages = document.querySelectorAll(".chat-bubble");
+        <div x-show="open" @click.away="open=false"
+             class="absolute bottom-12 left-1/2 -translate-x-1/2 bg-white shadow-lg rounded-xl w-40 p-2">
 
-      // Membuat elemen baru untuk hasil pencarian
-      const resultContainer = document.createElement('div');
-      resultContainer.className = 'chat-bubble sent';
-      const messageDiv = document.createElement('div');
-      messageDiv.className = 'chat-bubble sent';
-      // Isi tulisan kita
-      messageDiv.textContent = filter;
-      chatBox.appendChild(messageDiv);
+            <a class="block px-3 py-2 text-sm" href="<?= base_url('data-santri') ?>">Data Santri</a>
+            <a class="block px-3 py-2 text-sm" href="<?= base_url('data-psb') ?>">Data PSB</a>
 
-      messages.forEach(msg => {
-        const msgId = msg.id.toLowerCase();
-        msg.style.display = msgId.includes(filter) ? "block" : "none";
+            <button class="block px-3 py-2 text-sm w-full text-left"
+                    @click="$dispatch('open-santri-modal'); open=false">Lainnya</button>
+        </div>
+    </div>
 
-      });
+    <!-- Keuangan -->
+    <div x-data="{open:false}" class="relative">
+        <button @click="open=!open" class="text-center">
+            <span class="material-symbols-outlined w-6 h-6 mx-auto">account_balance_wallet</span>
+            <div class="text-xs">Keuangan</div>
+        </button>
 
-      // Hapus isian teks
-      document.getElementById('filterInput').value = '';
-    }
-  </script>
+        <div x-show="open" @click.away="open=false"
+             class="absolute bottom-12 left-1/2 -translate-x-1/2 bg-white shadow-lg rounded-xl w-40 p-2">
 
-  <!-- Bootstrap 4 JS + dependencies -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+            <a class="block px-3 py-2 text-sm" href="<?= base_url('beranda') ?>">Rekap</a>
+            <a class="block px-3 py-2 text-sm" href="<?= base_url('laporan-pemasukan') ?>">Pemasukan</a>
+            <a class="block px-3 py-2 text-sm" href="<?= base_url('claim') ?>">Pengeluaran</a>
+        </div>
+    </div>
+
+    <!-- Pembayaran -->
+    <div x-data="{open:false}" class="relative">
+        <button @click="open=!open" class="text-center">
+            <span class="material-symbols-outlined w-6 h-6 mx-auto">credit_card</span>
+            <div class="text-xs">Pembayaran</div>
+        </button>
+
+        <div x-show="open" @click.away="open=false"
+             class="absolute bottom-12 left-1/2 -translate-x-1/2 bg-white shadow-lg rounded-xl w-40 p-2">
+
+            <a class="block px-3 py-2 text-sm" href="<?= base_url('riwayat-pembayaran') ?>">Data Pembayaran</a>
+
+            <button class="block px-3 py-2 text-sm w-full text-left"
+                    @click="$dispatch('open-pembayaran-modal'); open=false">
+                Input Pembayaran
+            </button>
+
+            <a class="block px-3 py-2 text-sm" href="<?= base_url('tunggakan-admin') ?>">Tunggakan</a>
+        </div>
+    </div>
+
+    <!-- Guru -->
+    <div x-data="{open:false}" class="relative">
+        <button @click="open=!open" class="text-center">
+            <span class="material-symbols-outlined w-6 h-6 mx-auto">school</span>
+            <div class="text-xs">Guru</div>
+        </button>
+
+        <div x-show="open" @click.away="open=false"
+             class="absolute bottom-12 left-1/2 -translate-x-1/2 bg-white shadow-lg rounded-xl w-40 p-2">
+
+            <a class="block px-3 py-2 text-sm" href="<?= base_url('guru') ?>">Data Guru</a>
+            <a class="block px-3 py-2 text-sm" href="<?= base_url('jadwal-pelajaran') ?>">Jadwal</a>
+
+            <button class="block px-3 py-2 text-sm w-full text-left"
+                    @click="$dispatch('open-guru-modal'); open=false">
+                Lainnya
+            </button>
+        </div>
+    </div>
+
+</nav>
+
+
+<!-- MODAL SANTRI -->
+<div x-data="{open:false}"
+     @open-santri-modal.window="open=true"
+     x-show="open"
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+    <div class="bg-white w-80 rounded-2xl shadow-xl p-6" @click.away="open=false">
+
+        <h3 class="text-lg font-semibold mb-4">Menu Santri Lainnya</h3>
+
+        <div class="grid grid-cols-2 gap-3">
+            <a href="<?= base_url('seragam') ?>" class="p-3 bg-gray-50 rounded-xl text-center shadow">Seragam</a>
+            <a href="<?= base_url('saku') ?>" class="p-3 bg-gray-50 rounded-xl text-center shadow">Saku</a>
+            <a href="<?= base_url('alumni') ?>" class="p-3 bg-gray-50 rounded-xl text-center shadow">Alumni</a>
+            <a href="<?= base_url('checkin') ?>" class="p-3 bg-gray-50 rounded-xl text-center shadow">Check-in</a>
+
+            <a href="<?= base_url('komitmen-pembayaran') ?>"
+               class="col-span-2 p-3 bg-gray-50 rounded-xl text-center shadow">Komitmen Pembayaran</a>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL PEMBAYARAN -->
+<div x-data="{open:false}"
+     @open-pembayaran-modal.window="open=true"
+     x-show="open"
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+    <div class="bg-white w-80 rounded-2xl shadow-xl p-6" @click.away="open=false">
+
+        <h3 class="text-lg font-semibold mb-4">Pilih Jenis Pembayaran</h3>
+
+        <div class="space-y-3">
+            <a href="<?= base_url('pembayaran-kewajiban') ?>"
+               class="block p-3 bg-gray-50 rounded-xl shadow text-center">Kewajiban</a>
+
+            <a href="<?= base_url('pembayaran-psb') ?>"
+               class="block p-3 bg-gray-50 rounded-xl shadow text-center">PSB</a>
+
+            <a href="<?= base_url('pembayaran-alumni') ?>"
+               class="block p-3 bg-gray-50 rounded-xl shadow text-center">Alumni</a>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL GURU -->
+<div x-data="{open:false}"
+     @open-guru-modal.window="open=true"
+     x-show="open"
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+    <div class="bg-white w-80 rounded-2xl shadow-xl p-6" @click.away="open=false">
+
+        <h3 class="text-lg font-semibold mb-4">Menu Guru Lainnya</h3>
+
+        <div class="grid grid-cols-2 gap-3">
+            <a href="<?= base_url('validasi') ?>" class="p-3 bg-gray-50 rounded-xl shadow text-center">Absen</a>
+            <a href="<?= base_url('rekap') ?>" class="p-3 bg-gray-50 rounded-xl shadow text-center">Rekap</a>
+        </div>
+
+    </div>
+</div>
+
 </body>
-
 </html>

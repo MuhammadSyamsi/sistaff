@@ -1,116 +1,145 @@
 <?= $this->extend('template'); ?>
-
 <?= $this->section('konten'); ?>
 
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-lg-12 d-flex align-items-stretch mb-2">
-      <p class="btn btn-light me-2">Total <span class="badge bg-warning rounded-3 fw-semibold"><?= $total ?></span></p>
-      <p class="btn btn-light me-2">MTs <span class="badge bg-secondary rounded-3 fw-semibold"><?= $mts ?></span></p>
-      <p class="btn btn-light me-2">MA <span class="badge bg-danger rounded-3 fw-semibold"><?= $ma ?></span></p>
-    </div>
-    <div class="row">
-      <div class="col-lg-8 d-flex align-items-stretch">
-        <div class="card w-100">
-          <div class="card-body p-4">
-            <h5 class="card-title fw-semibold mb-4">Database Santri</h5>
-            <div class="table-responsive">
-              <table class="table text-nowrap mb-0 align-middle">
-                <thead class="text-dark fs-4">
-                  <tr>
-                    <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0">Nama</h6>
-                    </th>
-                    <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0">Kelas</h6>
-                    </th>
-                    <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0">pindah</h6>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php foreach ($psb as $rek) :  ?>
-                    <form action="mig<?= $rek['nisn'] ?>" method="post">
-                      <tr>
-                        <td class="border-bottom-0">
-                          <h6 class="fw-semibold mb-1"><?= $rek['nama']; ?></h6>
-                        </td>
-                        <td class="border-bottom-0">
-                          <p class="mb-0 fw-normal"><?= $rek['kelas']; ?></p>
-                        </td>
-                        <td class="border-bottom-0">
-                          <input type="hidden" class="form-control" id="id" name="id" value="<?= $rek['id']; ?>" />
-                          <input type="hidden" class="form-control" id="nisn" name="nisn" value="<?= $rek['nisn']; ?>" />
-                          <input type="hidden" class="form-control" id="nama" name="nama" value="<?= $rek['nama']; ?>" />
-                          <input type="hidden" class="form-control" id="program" name="program" value="<?= $rek['program']; ?>" />
-                          <input type="hidden" class="form-control" id="jenjang" name="jenjang" value="<?= $rek['jenjang']; ?>" />
-                          <input type="hidden" class="form-control" id="kelas" name="kelas" value="<?= $rek['kelas']; ?>" />
-                          <input type="hidden" class="form-control" id="tunggakandu" name="tunggakandu" value="<?= $rek['tdu']; ?>" />
-                          <input type="hidden" class="form-control" id="tunggakantl" name="tunggakantl" value=0 />
-                          <input type="hidden" class="form-control" id="tunggakanspp" name="tunggakanspp" value=0 />
-                          <input type="hidden" class="form-control" id="du" name="du" value="<?= $rek['daftarulang']; ?>" />
-                          <input type="hidden" class="form-control" id="spp" name="spp" value="<?= $rek['spp']; ?>" />
-                          <input type="hidden" class="form-control" id="tempatlahir" name="tempatlahir" value="<?= $rek['tempatlahir']; ?>" />
-                          <input type="hidden" class="form-control" id="tanggallahir" name="tanggallahir" value="<?= $rek['tanggal']; ?>" />
-                          <input type="hidden" class="form-control" id="asalsekolah" name="asalsekolah" value="<?= $rek['asalsekolah']; ?>" />
-                          <input type="hidden" class="form-control" id="tahunmasuk" name="tahunmasuk" value="<?= $rek['tahunmasuk']; ?>" />
-                          <input type="hidden" class="form-control" id="ayah" name="ayah" value="<?= $rek['ayah']; ?>" />
-                          <input type="hidden" class="form-control" id="alamatayah" name="alamatayah" value="<?= $rek['alamatayah']; ?>" />
-                          <input type="hidden" class="form-control" id="pekerjaanayah" name="pekerjaanayah" value="<?= $rek['pekerjaanayah']; ?>" />
-                          <input type="hidden" class="form-control" id="ibu" name="ibu" value="<?= $rek['ibu']; ?>" />
-                          <input type="hidden" class="form-control" id="pekerjaanibu" name="pekerjaanibu" value="<?= $rek['pekerjaanibu']; ?>" />
-                          <input type="hidden" class="form-control" id="kontak1" name="kontak1" value="<?= $rek['kontak1']; ?>" />
-                          <input type="hidden" class="form-control" id="kontak2" name="kontak2" value="<?= $rek['kontak2']; ?>" />
-                          <input type="hidden" class="form-control" id="berkas" name="berkas" value="<?= $rek['berkas']; ?>" />
-                          <button type="submit" class="btn btn-info m-1">
-                            <span>
-                              <i class="ti ti-logout"></i>
-                            </span>
-                          </button>
-                        </td>
-                      </tr>
-                    </form>
-                  <?php endforeach; ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-12">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+<!-- Statistik Santri (Gabung Jadi 1 Card) -->
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h5 class="fw-bold mb-3">Statistik Santri</h5>
+    <div class="row text-center">
+      <div class="col-4 mb-3 mb-md-0">
+        <div class="text-muted small">Total Calon Santri</div>
+        <div class="h3 fw-bold text-warning"><?= $total ?></div>
       </div>
-      <div class="col-lg-4 d-flex align-items-stretch">
-        <div class="card w-100">
-          <div class="card-body p-4">
-            <h5 class="card-title fw-semibold mb-4">Database Kelas</h5>
-            <div class="table-responsive">
-              <table class="table text-nowrap mb-0 align-middle">
-                <thead class="text-dark fs-4">
-                  <tr>
-                    <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0">Kelas</h6>
-                    </th>
-                    <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0">Jumlah</h6>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php foreach ($santri as $rekma) : ?>
-                    <tr>
-                      <td class="border-bottom-0">
-                        <h6 class="fw-semibold mb-1"><?= $rekma['kelas']; ?></h6>
-                      </td>
-                      <td class="border-bottom-0">
-                        <p class="mb-0 fw-normal"><?= $rekma['total']; ?></p>
-                      </td>
-                    </tr>
-                  <?php endforeach; ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+      <div class="col-4 mb-3 mb-md-0 border-start border-end">
+        <div class="text-muted small">Santri MTs</div>
+        <div class="h3 fw-bold text-secondary"><?= $mts ?></div>
+      </div>
+      <div class="col-4">
+        <div class="text-muted small">Santri MA</div>
+        <div class="h3 fw-bold text-danger"><?= $ma ?></div>
       </div>
     </div>
   </div>
-  <?= $this->endSection(); ?>
+</div>
+
+          <!-- Filter Santri -->
+          <div class="row mb-3">
+            <div class="col-12 d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0">Data Santri</h5>
+              
+              <!-- Tombol Tambah -->
+              <a href="<?= base_url('pendaftaran-formulir') ?>" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Tambah Pendaftaran
+              </a>
+            </div>
+
+            <div class="col-12">
+            <form id="formFilter" class="row g-2 align-items-end">
+              <!-- Jenjang -->
+              <div class="col-md-2">
+                <label for="filterJenjang" class="form-label mb-0">Jenjang</label>
+                <select name="jenjang" id="filterJenjang" class="form-select">
+                  <option value="">Pilih Jenjang</option>
+                  <?php foreach ($filterJenjang as $fj): ?>
+                    <option value="<?= $fj['jenjang']; ?>"><?= $fj['jenjang']; ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+
+              <!-- Kelas -->
+              <div class="col-md-2">
+                <label for="filterKelas" class="form-label mb-0">Kelas</label>
+                <select name="kelas" id="filterKelas" class="form-select" disabled>
+                  <option value="">Pilih Kelas</option>
+                </select>
+              </div>
+
+              <!-- Status -->
+              <div class="col-md-2">
+                <label for="filterStatus" class="form-label mb-0">Status</label>
+                <select name="status" id="filterStatus" class="form-select">
+                  <option value="">Pilih Status</option>
+                  <?php foreach ($statusList as $s): ?>
+                    <option value="<?= $s['status'] ?>"><?= ucfirst($s['status']) ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+
+              <!-- Pencarian -->
+              <div class="col-md-6">
+                <label for="keyword" class="form-label mb-0">Pencarian Nama</label>
+                <input type="text" name="keyword" id="keyword" class="form-control" placeholder="Cari Nama..." autocomplete="off">
+              </div>
+            </form>
+          </div>
+            <!-- Card AJAX -->
+  <div class="col-12 mt-3">
+    <div id="cardListSantri">
+      <!-- Data akan muncul di sini -->
+    </div>
+  </div>
+          </div>
+
+        </div> <!-- card-body -->
+      </div> <!-- card -->
+    </div> <!-- col -->
+  </div> <!-- row -->
+</div> <!-- container-fluid -->
+
+<!-- Script Filtering -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function () {
+  const kelasByJenjang = <?= json_encode($kelasByJenjang) ?>;
+  const form = $('#formFilter');
+
+  $('#filterJenjang').on('change', function () {
+    const jenjang = $(this).val();
+    let html = '<option value="">Pilih Kelas</option>';
+
+    if (jenjang && kelasByJenjang[jenjang]) {
+      kelasByJenjang[jenjang].forEach(k => {
+        html += `<option value="${k}">${k}</option>`;
+      });
+      $('#filterKelas').html(html).prop('disabled', false);
+    } else {
+      $('#filterKelas').html(html).prop('disabled', true);
+    }
+
+    filterSantri();
+  });
+
+  $('#filterKelas, #filterStatus, #keyword').on('change keyup', function () {
+    filterSantri();
+  });
+
+  function filterSantri() {
+    const kelas = $('#filterKelas').val();
+    const keyword = $('#keyword').val().trim();
+    const jenjang = $('#filterJenjang').val();
+
+    if (jenjang && kelas || keyword.length > 0) {
+      $.ajax({
+        type: 'GET',
+        url: '<?= base_url('Santri/psb') ?>',
+        data: form.serialize(),
+        success: function (html) {
+          $('#cardListSantri').html(html);
+        }
+      });
+    } else {
+      $('#cardListSantri').html('');
+    }
+  }
+
+  filterSantri(); // initial load
+});
+</script>
+
+<?= $this->endSection(); ?>

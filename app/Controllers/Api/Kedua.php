@@ -13,20 +13,31 @@ class Kedua extends ResourceController
     public function show($id = null)
     {
         $model = new TransferModel();
-        $data = [
-            'tanggal1' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1)->findColumn('tanggal'),
-            'tanggal2' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1, 1)->findColumn('tanggal'),
-            'tanggal3' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1, 2)->findColumn('tanggal'),
-            'keterangan1' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1)->findColumn('keterangan'),
-            'keterangan2' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1, 1)->findColumn('keterangan'),
-            'keterangan3' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1, 2)->findColumn('keterangan'),
-            'rekening1' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1)->findColumn('rekening'),
-            'rekening2' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1, 1)->findColumn('rekening'),
-            'rekening3' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1, 2)->findColumn('rekening'),
-            'nominal1' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1)->findColumn('saldomasuk'),
-            'nominal2' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1, 1)->findColumn('saldomasuk'),
-            'nominal3' => $model->where('nisn', $id)->orderBy('tanggal', 'desc')->limit(1, 2)->findColumn('saldomasuk'),
-        ];
-        return $this->respond($data);
+
+        // Ambil 3 transaksi terakhir dalam satu query saja
+        $transaksi = $model
+            ->where("nisn", $id)
+            ->orderBy("tanggal", "desc")
+            ->limit(3)
+            ->findAll();
+
+        // Format hasil
+        $data = [];
+        for ($i = 0; $i < 3; $i++) {
+            $row = $transaksi[$i] ?? [
+                "tanggal" => null,
+                "keterangan" => null,
+                "rekening" => null,
+                "saldomasuk" => null,
+            ];
+            $data[] = [
+                "tanggal" => $row["tanggal"],
+                "keterangan" => $row["keterangan"],
+                "rekening" => $row["rekening"],
+                "nominal" => $row["saldomasuk"],
+            ];
+        }
+
+        return $this->response->setJSON($data);
     }
 }

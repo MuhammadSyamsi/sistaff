@@ -27,47 +27,8 @@ class Psb extends BaseController
             'stformulir' => $psbmodel->where('status', 'formulir')->findAll(),
             'status' => $psbmodel->where('status', 'baru')->findAll(),
             'hasil' => $psbmodel->where('status', 'sudah test')->findAll(),
-            'diterima' => $psbmodel->where('status', 'diterima')->findAll()
-        ];
-        return view('psb/home', $data);
-    }
-    public function mts()
-    {
-        $psbmodel = new PsbModel();
-        $data = [
-            'total' => $psbmodel->select('count(nama) as total')->findAll(),
-            'mts' => $psbmodel->select('count(nama) as total')->where('jenjang', 'mts')->findAll(),
-            'ma' => $psbmodel->select('count(nama) as total')->where('jenjang', 'ma')->findAll(),
-            'mundur' => $psbmodel->select('count(nama) as total')->where('status', 'mengundurkan diri')->where('jenjang', 'mts')->findAll(),
-            'formulir' => $psbmodel->select('count(nama) as total')->where('status', 'formulir')->where('jenjang', 'mts')->findAll(),
-            'komitmen' => $psbmodel->select('count(nama) as total')->where('status', 'sudah test')->where('jenjang', 'mts')->findAll(),
-            'observasi' => $psbmodel->select('count(nama) as total')->where('status', 'baru')->where('jenjang', 'mts')->findAll(),
-            'fix' => $psbmodel->select('count(nama) as total')->where('status', 'diterima')->where('jenjang', 'mts')->findAll(),
-            'list' => $psbmodel->where('jenjang', 'mts')->where('jenjang', 'mts')->where('status', 'mengundurkan diri')->findAll(),
-            'stformulir' => $psbmodel->where('status', 'formulir')->where('jenjang', 'mts')->findAll(),
-            'status' => $psbmodel->where('status', 'baru')->where('jenjang', 'mts')->findAll(),
-            'hasil' => $psbmodel->where('status', 'sudah test')->where('jenjang', 'mts')->findAll(),
-            'diterima' => $psbmodel->where('status', 'diterima')->where('jenjang', 'mts')->findAll()
-        ];
-        return view('psb/home', $data);
-    }
-    public function ma()
-    {
-        $psbmodel = new PsbModel();
-        $data = [
-            'total' => $psbmodel->select('count(nama) as total')->findAll(),
-            'mts' => $psbmodel->select('count(nama) as total')->where('jenjang', 'mts')->findAll(),
-            'ma' => $psbmodel->select('count(nama) as total')->where('jenjang', 'ma')->findAll(),
-            'mundur' => $psbmodel->select('count(nama) as total')->where('status', 'mengundurkan diri')->where('jenjang', 'ma')->findAll(),
-            'formulir' => $psbmodel->select('count(nama) as total')->where('status', 'formulir')->where('jenjang', 'ma')->findAll(),
-            'komitmen' => $psbmodel->select('count(nama) as total')->where('status', 'sudah test')->where('jenjang', 'ma')->findAll(),
-            'observasi' => $psbmodel->select('count(nama) as total')->where('status', 'baru')->where('jenjang', 'ma')->findAll(),
-            'fix' => $psbmodel->select('count(nama) as total')->where('status', 'diterima')->where('jenjang', 'ma')->findAll(),
-            'list' => $psbmodel->where('jenjang', 'ma')->where('jenjang', 'ma')->where('status', 'mengundurkan diri')->findAll(),
-            'stformulir' => $psbmodel->where('status', 'formulir')->where('jenjang', 'ma')->findAll(),
-            'status' => $psbmodel->where('status', 'baru')->where('jenjang', 'ma')->findAll(),
-            'hasil' => $psbmodel->where('status', 'sudah test')->where('jenjang', 'ma')->findAll(),
-            'diterima' => $psbmodel->where('status', 'diterima')->where('jenjang', 'ma')->findAll()
+            'diterima' => $psbmodel->where('status', 'diterima')->findAll(),
+            'general' => $psbmodel->findAll()
         ];
         return view('psb/home', $data);
     }
@@ -82,42 +43,64 @@ class Psb extends BaseController
         return view('psb/insert', $data);
     }
 
-    public function save()
-    {
-        $combinedValue = $_POST["jenjang"];
-        list($jenjang, $kelas) = explode('|', $combinedValue);
-        $psbmodel = new PsbModel();
+public function save()
+{
+    $psbmodel = new PsbModel();
+    $detailmodel = new DetailModel();
+
+    $santriData = $this->request->getPost('santri');
+
+    foreach ($santriData as $row) {
+        list($jenjang, $kelas) = explode('|', $row['jenjang']);
+
         $psbmodel->insert([
-            'id' => $this->request->getPost('id'),
-            'nisn' => $this->request->getPost('nisn'),
-            'nama' => $this->request->getPost('nama'),
+            'id' => $row['id'],
+            'nisn' => $row['nisn'],
+            'nama' => $row['nama'],
             'jenjang' => $jenjang,
             'kelas' => $kelas,
-            'program' => $this->request->getPost('program'),
-            'tanggal' => $this->request->getPost('tanggal'),
-            'tdu' => (0),
-            'daftarulang' => (0),
-            'spp' => (0),
-            'status' => $this->request->getPost('status'),
-            'formulir' => $this->request->getPost('formulir'),
-            'rekening' => $this->request->getPost('rekening')
+            'program' => $row['program'],
+            'tanggal' => $row['tanggal'],
+            'tunggakandu' => 0,
+            'daftarulang' => 0,
+            'spp' => 0,
+            'status' => $row['status'],
+            'formulir' => $row['formulir'],
+            'rekening' => $row['rekening']
         ]);
-        $detailmodel = new DetailModel();
+
         $detailmodel->insert([
-            'id' => $this->request->getPost('id'),
-            'program' => $this->request->getPost('program'),
-            'tanggal' => $this->request->getPost('tanggal'),
-            'rekening' => $this->request->getPost('rekening'),
+            'id' => $row['id'],
+            'program' => $row['program'],
+            'tanggal' => $row['tanggal'],
+            'rekening' => $row['rekening'],
             'daftarulang' => 0,
             'tunggakan' => 0,
             'spp' => 0,
             'uangsaku' => 0,
             'infaq' => 0,
-            'formulir' => $this->request->getPost('formulir')
+            'formulir' => $row['formulir']
         ]);
-
-        return redirect()->to(base_url('/psb'));
     }
+
+    return redirect()->to(base_url());
+}
+
+public function filter()
+{
+    if ($this->request->isAJAX()) {
+        $status = $this->request->getJSON()->status ?? null;
+
+        $psbmodel = new PsbModel();
+        $builder = $psbmodel->orderBy('tanggal', 'DESC');
+
+        if ($status) $builder->where('status', $status);
+
+        $data['result'] = $builder->findAll();
+
+        return view('psb/table', $data);
+    }
+}
 
     public function daftarbaru_psb()
     {
@@ -125,7 +108,7 @@ class Psb extends BaseController
         $selectedItems = $this->request->getPost('cek');
         $psbmodel->whereIn('id', $selectedItems)->set(['status' => 'sudah test'])->update();
 
-        return redirect()->to(base_url('/psb'));
+        return redirect()->to(base_url('/pendaftaran-observasi'));
     }
 
     public function editformulir($id)
@@ -189,7 +172,7 @@ class Psb extends BaseController
                 'kontak2' => $this->request->getPost('kontak2'),
                 'berkas' => $this->request->getPost('berkas')
             ])->update();
-            return redirect()->to(base_url('/psb'));
+            return redirect()->to(base_url());
         }
     }
 
@@ -216,7 +199,7 @@ class Psb extends BaseController
             'kontak2' => $this->request->getPost('kontak2'),
             'berkas' => $this->request->getPost('berkas')
         ])->update();
-        return redirect()->to(base_url('/psb'));
+        return redirect()->to(base_url());
     }
 
     public function mundur($id)
@@ -225,7 +208,7 @@ class Psb extends BaseController
         $psbmodel->where('id', $id)->set([
             'status' => 'mengundurkan diri',
         ])->update();
-        return redirect()->to(base_url('/psb'));
+        return redirect()->to(base_url('/riwayat-alumni'));
     }
 
     public function komitmen($id)
@@ -248,7 +231,7 @@ class Psb extends BaseController
             'spp' => $this->request->getPost('spp')
         ])->update();
 
-        return redirect()->to(base_url('/psb'));
+        return redirect()->to(base_url());
     }
 
     public function pembayaran()
@@ -280,7 +263,6 @@ class Psb extends BaseController
                 'nama' => $this->request->getPost('nama'),
                 'program' => 'PSB',
                 'kelas' => $this->request->getPost('kelas'),
-                'bukti' => $this->request->getPost('bukti'),
                 'saldomasuk' => $this->request->getPost('saldomasuk'),
                 'tanggal' => $this->request->getPost('tanggal'),
                 'keterangan' => $this->request->getPost('keterangan'),
@@ -292,8 +274,7 @@ class Psb extends BaseController
                 'program' => 'PSB',
                 'tanggal' => $this->request->getPost('tanggal'),
                 'rekening' => $this->request->getPost('rekening'),
-                'daftarulang' => $this->request->getPost('tdu'),
-                'tunggakan' => 0,
+                'daftarulang' => $this->request->getPost('tunggakandu'),
                 'spp' => 0,
                 'uangsaku' => 0,
                 'infaq' => $this->request->getPost('infaq'),
@@ -303,10 +284,10 @@ class Psb extends BaseController
             $hitungDu = 0;
             $du = $postKewajiban->where('nisn', $this->request->getPost('nisn'))->findAll();
             foreach ($du as $ts) {
-                $hitungDu = $ts['tdu'] - $this->request->getPost('tdu');
+                $hitungDu = $ts['tunggakandu'] - $this->request->getPost('tdu');
             };
             $postKewajiban->where('nisn', $this->request->getPost('nisn'))->set([
-                'tdu' => $hitungDu,
+                'tunggakandu' => $hitungDu,
             ])->update();
 
             $data = [
@@ -338,7 +319,6 @@ class Psb extends BaseController
             'nisn' => $this->request->getPost('nisn'),
             'nama' => $this->request->getPost('nama'),
             'kelas' => $this->request->getPost('kelas'),
-            'bukti' => $this->request->getPost('bukti'),
             'saldomasuk' => $this->request->getPost('saldomasuk'),
             'tanggal' => $this->request->getPost('tanggal'),
             'keterangan' => $this->request->getPost('keterangan'),
@@ -358,7 +338,7 @@ class Psb extends BaseController
         $santri->save([
             'id' => $this->request->getPost('id'),
             'nama' => $this->request->getPost('nama'),
-            'tdu' => $this->request->getPost('santridu'),
+            'tunggakandu' => $this->request->getPost('santridu'),
         ]);
 
         $data = [
@@ -379,17 +359,62 @@ class Psb extends BaseController
         fclose($file);
     }
 
-    public function migrasi()
+    public function migrasiKeSantri()
     {
-        $psbmodel = new PsbModel();
-        $santrimodel = new SantriModel();
-        $data = [
-            'data' => $psbmodel->where('status', 'diterima')->findAll()
-        ];
+        $ids = $this->request->getPost('ids');
+        if (!$ids || !is_array($ids)) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Tidak ada data yang dipilih.']);
+        }
 
-        return view('psb/migrasi', $data);
+        $psbModel = new PsbModel();
+        $santriModel = new SantriModel();
+
+        $dataPsb = $psbModel->whereIn('id', $ids)->findAll();
+        $migrated = 0;
+
+        foreach ($dataPsb as $psb) {
+            // Cek dulu apakah sudah ada di tabel santri berdasarkan NISN atau field lainnya
+            $cek = $santriModel->where('nisn', $psb['nisn'])->first();
+            if ($cek) {
+                continue; // skip jika sudah ada
+            }
+
+            // Buat data baru untuk santri
+            $dataBaru = [
+                'nisn' => $psb['nisn'],
+                'nama' => $psb['nama'],
+                'program' => $psb['program'],
+                'kelas' => $psb['kelas'],
+                'jenjang' => $psb['jenjang'],
+                'tahunmasuk' => $psb['tahunmasuk'],
+                'alamatayah' => $psb['alamatayah'],
+                'kontak1' => $psb['kontak1'],
+                'kontak2' => $psb['kontak2'],
+                'tunggakandu' => $psb['tunggakandu'],
+                'du' => $psb['daftarulang'],
+                'spp' => $psb['spp'],
+                'tempatlahir' => $psb['tempatlahir'],
+                'tanggallahir' => $psb['tanggallahir'],
+                'asalsekolah' => $psb['asalsekolah'],
+                'ayah' => $psb['ayah'],
+                'pekerjaanayah' => $psb['pekerjaanayah'],
+                'ibu' => $psb['ibu'],
+                'pekerjaanibu' => $psb['pekerjaanibu'],
+                'alamatibu' => $psb['alamatibu'],
+                'berkas' => $psb['berkas'],
+            ];
+
+            $santriModel->insert($dataBaru);
+            $psbModel->delete($psb['id']);
+            $migrated++;
+        }
+
+        return $this->response->setJSON([
+            'status' => true,
+            'message' => "Berhasil migrasi $migrated data santri.",
+        ]);
     }
-
+    
     public function laporanpsb()
     {
         $psbmodel = new PsbModel();

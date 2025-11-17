@@ -10,11 +10,19 @@ class Home extends ResourceController
 {
     use ResponseTrait;
 
-    public function show($id = null)
+    public function index()
     {
+        $keyword = $this->request->getGet("search");
         $model = new SantriModel();
-        $data = $model->find($id);
 
-        return $this->respond($data);
+        if (!$keyword) {
+            $data = $model->findAll(5);
+        } else {
+            $data = $model->cari($keyword);
+        }
+
+        return $this->response->setJSON($data);
     }
 }
+
+?>

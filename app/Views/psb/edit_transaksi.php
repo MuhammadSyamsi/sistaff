@@ -21,17 +21,9 @@
                                         <input type="text" hidden id="nisn" name="nisn" value="<?= $c['nisn']; ?>" />
                                         <input type="text" hidden id="kelas" name="kelas" value="<?= $c['kelas']; ?>" />
                                     </div>
-                                    <div class="mb-1 col-lg-2">
-                                        <label for="bukti" class="form-label">Bukti</label>
-                                        <select type="text" class="form-control" id="bukti" name="bukti">
-                                            <option value="<?= $c['bukti'] ?>"><?= $c['bukti'] ?></option>
-                                            <option value="ada">ada</option>
-                                            <option value="tidak ada">tidak ada</option>
-                                        </select>
-                                    </div>
                                     <div class="mb-1 col-lg-4">
                                         <label for="saldomasuk" class="form-label">Saldo Masuk</label>
-                                        <input type="number" class="form-control" id="saldomasuk" name="saldomasuk" value="<?= $c['saldomasuk']; ?>">
+                                        <input type="text" class="form-control" id="saldomasuk" name="saldomasuk" value="<?= $c['saldomasuk']; ?>">
                                     </div>
                                     <div class="mb-1 col-lg-3">
                                         <label for="tanggal" class="form-label">tanggal</label>
@@ -59,7 +51,7 @@
                                     <?php foreach ($santri as $s) : ?>
                                         <div class="mb-1 col-lg-4">
                                             <label for="nama" class="form-label">Daftar Ulang</label>
-                                            <input type="text" class="form-control" id="santridu" name="santridu" value="<?= $s['tdu']; ?>" />
+                                            <input type="text" class="form-control" id="santridu" name="santridu" value="<?= $s['tunggakandu']; ?>" />
                                             <input type="text" hidden id="id" name="id" value="<?= $s['id']; ?>" />
                                         </div>
                                     <?php endforeach; ?>
@@ -98,7 +90,7 @@
                                 </div>
                                 <div class="card-body p-4">
                                     <button type="submit" class="btn btn-success m-1">Simpan</button>
-                                    <a type="button" class="btn btn-warning m-1" href="./mutasi">Kembali</a>
+                                    <a type="button" class="btn btn-warning m-1" href="<?= base_url('riwayat-pembayaran') ;?>">Kembali</a>
                                 </div>
                             </form>
                     </div>
@@ -107,4 +99,31 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const numericFields = [
+      'saldomasuk', 'santridu',
+      'du', 'tunggakan', 'spp', 'uangsaku', 'infaq', 'formulir'
+    ];
+
+    numericFields.forEach(id => {
+      const input = document.getElementById(id);
+      if (input) {
+        new Cleave(input, {
+          numeral: true,
+          numeralThousandsGroupStyle: 'thousand'
+        });
+      }
+    });
+
+    document.querySelector('form').addEventListener('submit', function () {
+      numericFields.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+          input.value = input.value.replace(/\./g, '').replace(/,/g, '');
+        }
+      });
+    });
+  });
+</script>
 <?= $this->endSection(); ?>

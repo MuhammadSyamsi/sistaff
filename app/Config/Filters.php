@@ -72,8 +72,52 @@ class Filters extends BaseConfig
      * 'isLoggedIn' => ['before' => ['account/*', 'profiles/*']]
      */
     public array $filters = [
-        'login' => ['before' => []],
-    ];
-    //     'login' => ['before' => ['mutasi', 'lulus', 'santripsb', 'santrialumni', 'santrilain', 'koperasi', 'tambah', 'pembayaranalumni', 'tambahpsb', 'editpsb', 'pembayaran', 'migrasi', 'pindah(:any)', 'mig(:any)', 'save', 'savealumni', 'cetak', 'cetakpsb', 'cetakalumni', 'mutasi', 'nextmonth', 'naikkelas', 'psb(:num)', '(:num)', 'edit', 'delet/(:num)', 'formulir_psb', 'bayar', 'edittungpsb', 'formulir(:num)', 'fullform', 'daftarbaru_psb', 'komitmen(:num)', 'closing(:num)', 'pembayaran']],
-    // ];
+    'login' => [
+        'before' => [
+            // Semua route kecuali yang umum
+            'beranda',
+            'musrif',
+            'checkin',
+            'check',
+            'home/search',
+            'guru/*',
+            //'data-tunggakan',
+            //'tunggakan/search',
+            'data-santri',
+            'Santri/*',
+            'riwayat-alumni',
+            'pendaftaran-observasi',
+            'pendaftaran-formulir',
+            'pindah*',
+            'mig*',
+            'formulir*',
+            'daftarulangBeasiswa',
+            'daftarulangMandiri',
+            'pembayaran-kewajiban',
+            'save',
+            'cetak',
+            'riwayat-pembayaran',
+            'pembayaran-alumni',
+            'pembayaran-psb',
+            'download-laporan',
+            'keuangan/*',
+            'alumni/*',
+            'downloadpsb',
+            'edit',
+            'delet/*',
+            'editformulir*',
+            'mundur*',
+            'formulir_psb',
+            'bayar',
+            'edittungpsb',
+            'fullform',
+            'fulleditform',
+            'daftarbaru_psb',
+            'komitmen*',
+            'closing*',
+            'pembayaran',
+            'user/*',
+            ]
+    ],
+];
 }

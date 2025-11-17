@@ -32,7 +32,6 @@ class Alumni extends BaseController
             'nama' => $this->request->getPost('nama'),
             'program' => $this->request->getPost('program'),
             'kelas' => $this->request->getPost('kelas'),
-            'bukti' => $this->request->getPost('bukti'),
             'saldomasuk' => $this->request->getPost('saldomasuk'),
             'tanggal' => $this->request->getPost('tanggal'),
             'keterangan' => $this->request->getPost('keterangan'),
@@ -68,10 +67,8 @@ class Alumni extends BaseController
             'tunggakanspp' => $hitungSpp
         ]);
 
-        $data = [
-            'id' => $this->request->getPost('id')
-        ];
-        return view('alumni/kwitansi', $data);
+    $id = $this->request->getPost('id');
+    return redirect()->to('/kwitansi-alumni/' . $id);
     }
 
     public function cetak()
@@ -139,7 +136,7 @@ class Alumni extends BaseController
         $data['edit'] = $transfer->where('idtrans', $idtrans)->find();
         $data['detail'] = $detailMod->where('id', $idtrans)->find();
         $data['santri'] = $santri->where('nama', $nama)->find();
-        return view('pages/edit_transaksi', $data);
+        return view('alumni/edit_transaksi', $data);
     }
 
     public function edit()
@@ -152,7 +149,6 @@ class Alumni extends BaseController
             'nisn' => $this->request->getPost('nisn'),
             'nama' => $this->request->getPost('nama'),
             'kelas' => $this->request->getPost('kelas'),
-            'bukti' => $this->request->getPost('bukti'),
             'saldomasuk' => $this->request->getPost('saldomasuk'),
             'tanggal' => $this->request->getPost('tanggal'),
             'keterangan' => $this->request->getPost('keterangan'),
@@ -193,6 +189,6 @@ class Alumni extends BaseController
 
         echo '<script>alert("Proses berhasil dilakukan!");</script>';
 
-        return redirect()->to(base_url('/keuangan'));
+        return redirect()->to(base_url('/riwayat-pembayaran'));
     }
 }

@@ -8,10 +8,11 @@ class SantriModel extends Model
 {
     protected $table      = 'santri';
     protected $primaryKey = 'nisn';
-    protected $allowedFields = ['nisn', 'nama', 'tunggakanspp', 'tunggakandu', 'tunggakantl', 'du', 'spp', 'kelas', 'tahunmasuk'];
+    protected $allowedFields = ['nisn', 'nama', 'tunggakanspp', 'tunggakandu',  'tunggakandu2', 'tunggakandu3', 'tunggakantl', 'du', 'spp', 'kelas', 'tahunmasuk', 'saku', 'hp', 'program', 'jenjang', 'tempatlahir', 'tanggallahir', 'asalsekolah', 'ayah', 'pekerjaanayah', 'alamatayah', 'ibu', 'pekerjaanibu', 'alamatibu', 'kontak1', 'kontak2', 'berkas'];
 
-    public function search($keyword)
+    public function cari($keyword)
     {
-        return $this->like('nama', $keyword)->findAll();
-    }
+        return $this->table('santri')->like('nama', $keyword)->findAll(5);
+    } 
 }
+
