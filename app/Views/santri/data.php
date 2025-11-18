@@ -2,7 +2,6 @@
 <?= $this->section('konten'); ?>
 
 <div class="container mx-auto p-4" x-data="santriApp()">
-
   <!-- Top Cards -->
   <div class="grid lg:grid-cols-2 gap-4 mb-6">
     <!-- Data Santri Toggle -->
@@ -10,10 +9,10 @@
       <div class="flex justify-between items-center mb-4">
         <h5 class="font-semibold text-lg">Data Santri</h5>
         <div class="flex space-x-2">
-          <button @click="active='mts'" :class="active==='mts' ? 'bg-green-500 text-white' : 'bg-white border border-green-500 text-green-500'" 
-                  class="px-3 py-1 rounded-md text-sm font-medium">MTs</button>
-          <button @click="active='ma'" :class="active==='ma' ? 'bg-red-500 text-white' : 'bg-white border border-red-500 text-red-500'" 
-                  class="px-3 py-1 rounded-md text-sm font-medium">MA</button>
+          <button @click="active='mts'" :class="active==='mts' ? 'bg-green-500 text-white' : 'bg-white border border-green-500 text-green-500'"
+            class="px-3 py-1 rounded-md text-sm font-medium">MTs</button>
+          <button @click="active='ma'" :class="active==='ma' ? 'bg-red-500 text-white' : 'bg-white border border-red-500 text-red-500'"
+            class="px-3 py-1 rounded-md text-sm font-medium">MA</button>
         </div>
       </div>
 
@@ -63,8 +62,8 @@
   <div class="mb-4">
     <div class="flex justify-between items-center mb-3">
       <h5 class="font-semibold text-lg">Data Santri</h5>
-      <a href="<?= base_url('Santri/download') ?>" 
-         class="flex items-center gap-1 text-blue-600 border border-blue-600 px-3 py-1 rounded hover:bg-blue-600 hover:text-white transition">
+      <a href="<?= base_url('Santri/download') ?>"
+        class="flex items-center gap-1 text-blue-600 border border-blue-600 px-3 py-1 rounded hover:bg-blue-600 hover:text-white transition">
         <span class="material-symbols-outlined">download</span> Download
       </a>
     </div>
@@ -93,8 +92,8 @@
 
       <div>
         <label for="keyword" class="block mb-1 text-gray-600">Pencarian Nama</label>
-        <input type="text" id="keyword" name="keyword" placeholder="Cari Nama..." 
-               class="w-full border rounded px-3 py-2" x-model="filter.keyword" @input.debounce.500ms="filterSantri">
+        <input type="text" id="keyword" name="keyword" placeholder="Cari Nama..."
+          class="w-full border rounded px-3 py-2" x-model="filter.keyword" @input.debounce.500ms="filterSantri">
       </div>
     </form>
   </div>
@@ -105,73 +104,123 @@
   </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function () {
-  const kelasByJenjang = <?= json_encode($kelasByJenjang) ?>;
-  const form = $('#formFilter');
+  $(document).ready(function() {
+    const kelasByJenjang = <?= json_encode($kelasByJenjang) ?>;
+    const form = $('#formFilter');
 
-  $('#filterJenjang').on('change', function () {
-    const jenjang = $(this).val();
-    let html = '<option value="">Pilih Kelas</option>';
+    $('#filterJenjang').on('change', function() {
+      const jenjang = $(this).val();
+      let html = '<option value="">Pilih Kelas</option>';
 
-    if (jenjang && kelasByJenjang[jenjang]) {
-      kelasByJenjang[jenjang].forEach(k => {
-        html += `<option value="${k}">${k}</option>`;
-      });
-      $('#filterKelas').html(html).prop('disabled', false);
-    } else {
-      $('#filterKelas').html(html).prop('disabled', true);
+      if (jenjang && kelasByJenjang[jenjang]) {
+        kelasByJenjang[jenjang].forEach(k => {
+          html += `<option value="${k}">${k}</option>`;
+        });
+        $('#filterKelas').html(html).prop('disabled', false);
+      } else {
+        $('#filterKelas').html(html).prop('disabled', true);
+      }
+
+      filterSantri();
+    });
+
+    $('#filterKelas, #keyword').on('change keyup', function() {
+      filterSantri();
+    });
+
+    function filterSantri() {
+      const kelas = $('#filterKelas').val();
+      const keyword = $('#keyword').val().trim();
+      const jenjang = $('#filterJenjang').val();
+
+      if (jenjang && kelas || keyword.length > 0) {
+        $.ajax({
+          type: 'GET',
+          url: '<?= base_url('Santri/data') ?>',
+          data: form.serialize(),
+          success: function(html) {
+            $('#cardListSantri').html(html);
+          }
+        });
+      } else {
+        $('#cardListSantri').html('');
+      }
     }
 
-    filterSantri();
+    filterSantri(); // initial load
   });
 
-  $('#filterKelas, #keyword').on('change keyup', function () {
-    filterSantri();
-  });
+  function santriApp() {
+    return {
+      active: 'mts',
 
-  function filterSantri() {
-    const kelas = $('#filterKelas').val();
-    const keyword = $('#keyword').val().trim();
-    const jenjang = $('#filterJenjang').val();
+      // Data filter
+      filter: {
+        jenjang: '',
+        kelas: '',
+        keyword: ''
+      },
 
-    if (jenjang && kelas || keyword.length > 0) {
-      $.ajax({
-        type: 'GET',
-        url: '<?= base_url('Santri/data') ?>',
-        data: form.serialize(),
-        success: function (html) {
-          $('#cardListSantri').html(html);
+      // Data kelas berdasarkan jenjang (dari PHP)
+      kelasByJenjang: <?= json_encode($kelasByJenjang) ?>,
+
+      // pilihan kelas
+      kelasOptions: [],
+
+      // loading
+      loading: false,
+
+      // Update kelas saat pilihan jenjang berubah
+      updateKelas() {
+        if (this.filter.jenjang && this.kelasByJenjang[this.filter.jenjang]) {
+          this.kelasOptions = this.kelasByJenjang[this.filter.jenjang];
+        } else {
+          this.kelasOptions = [];
+          this.filter.kelas = '';
         }
-      });
-    } else {
-      $('#cardListSantri').html('');
+        this.filterSantri();
+      },
+
+      // Debounce manual 500ms
+      timer: null,
+      debounceFilter() {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          this.filterSantri();
+        }, 500);
+      },
+
+      // Load data AJAX
+      filterSantri() {
+        const {
+          jenjang,
+          kelas,
+          keyword
+        } = this.filter;
+
+        // Tidak load kalau kosong semua
+        if (!(jenjang && kelas) && keyword.trim().length === 0) {
+          document.getElementById('cardListSantri').innerHTML = '';
+          return;
+        }
+
+        this.loading = true;
+
+        fetch(`<?= base_url('Santri/data') ?>?jenjang=${jenjang}&kelas=${kelas}&keyword=${keyword}`)
+          .then(res => res.text())
+          .then(html => {
+            document.getElementById('cardListSantri').innerHTML = html;
+            this.loading = false;
+          });
+      },
+
+      // initial load
+      init() {
+        this.filterSantri();
+      }
     }
   }
-
-  filterSantri(); // initial load
-});
-</script>
-<script>
-  const btnMts = document.getElementById('btn-mts');
-  const btnMa = document.getElementById('btn-ma');
-  const dataMts = document.getElementById('data-mts');
-  const dataMa = document.getElementById('data-ma');
-
-  btnMts.addEventListener('click', function () {
-    btnMts.classList.add('active');
-    btnMa.classList.remove('active');
-    dataMts.classList.remove('d-none');
-    dataMa.classList.add('d-none');
-  });
-
-  btnMa.addEventListener('click', function () {
-    btnMa.classList.add('active');
-    btnMts.classList.remove('active');
-    dataMa.classList.remove('d-none');
-    dataMts.classList.add('d-none');
-  });
 </script>
 
 <?= $this->endSection(); ?>

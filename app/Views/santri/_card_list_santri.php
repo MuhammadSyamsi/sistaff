@@ -1,60 +1,60 @@
 <div class="container mx-auto p-4" x-data="santriApp()">
 
   <!-- Pilih Semua & Tombol Aksi Masal -->
-  <?php if(count($santri) > 0): ?>
-  <div class="flex items-center mb-4 space-x-4">
-    <div>
-      <input type="checkbox" id="checkAll" class="form-checkbox h-5 w-5" x-model="allChecked" @change="toggleAll">
-      <label for="checkAll" class="ml-2 text-gray-700 font-medium">Pilih Semua</label>
+  <?php if (count($santri) > 0): ?>
+    <div class="flex items-center mb-4 space-x-4">
+      <div>
+        <input type="checkbox" id="checkAll" class="form-checkbox h-5 w-5" x-model="allChecked" @change="toggleAll">
+        <label for="checkAll" class="ml-2 text-gray-700 font-medium">Pilih Semua</label>
+      </div>
+      <button type="button" class="bg-blue-600 text-white px-3 py-1 rounded disabled:opacity-50"
+        :disabled="checkedSantri.length===0"
+        @click="openModalEditMasal">
+        <span class="material-symbols-outlined align-middle">edit_square</span> Edit Massal
+      </button>
     </div>
-    <button type="button" class="bg-blue-600 text-white px-3 py-1 rounded disabled:opacity-50" 
-            :disabled="checkedSantri.length===0" 
-            @click="openModalEditMasal">
-      <span class="material-symbols-outlined align-middle">edit_square</span> Edit Massal
-    </button>
-  </div>
   <?php endif; ?>
 
   <!-- List Santri -->
   <div class="grid gap-4">
-    <?php foreach($santri as $s): ?>
-    <div class="bg-white shadow rounded-lg p-4 relative cursor-pointer selectable-card"
-         :class="checkedSantri.includes('<?= $s['nisn'] ?>') ? 'bg-blue-100' : ''"
-         @click="toggleSantri('<?= $s['nisn'] ?>')">
-      
-      <input type="checkbox" class="hidden" :value="'<?= $s['nisn'] ?>'" x-model="checkedSantri">
-      
-      <!-- Info Santri -->
-      <div>
-        <h6 class="font-semibold text-gray-800"><?= $s['nama'] ?></h6>
-        <p class="text-gray-500 text-sm mt-1">
-          <span class="mr-2"><strong>NISN:</strong> <?= $s['nisn'] ?></span>
-          <span class="mr-2"><strong>Program:</strong> <?= $s['program'] ?></span>
-          <span class="mr-2"><strong>Jenjang:</strong> <?= $s['jenjang'] ?></span>
-          <span class="mr-2"><strong>Kelas:</strong> <?= $s['kelas'] ?></span>
-        </p>
-      </div>
+    <?php foreach ($santri as $s): ?>
+      <div class="bg-white shadow rounded-lg p-4 relative cursor-pointer selectable-card"
+        :class="checkedSantri.includes('<?= $s['nisn'] ?>') ? 'bg-blue-100' : ''"
+        @click="toggleSantri('<?= $s['nisn'] ?>')">
 
-      <!-- Tombol Aksi Individual -->
-      <div class="flex space-x-2 mt-2">
-        <button class="flex-1 bg-white border border-blue-600 text-blue-600 px-2 py-1 rounded hover:bg-blue-600 hover:text-white transition"
-                @click.stop="editSantri('<?= $s['nisn'] ?>')">
-          <span class="material-symbols-outlined align-middle">edit</span> Edit
-        </button>
-        <button class="flex-1 bg-white border border-red-600 text-red-600 px-2 py-1 rounded hover:bg-red-600 hover:text-white transition"
-                @click.stop="keluarSantri('<?= $s['nisn'] ?>')">
-          <span class="material-symbols-outlined align-middle">logout</span> Keluar
-        </button>
-        <button class="flex-1 bg-white border border-green-600 text-green-600 px-2 py-1 rounded hover:bg-green-600 hover:text-white transition"
-                @click.stop="arsipSantri('<?= $s['nisn'] ?>')">
-          <span class="material-symbols-outlined align-middle">archive</span> Arsip
-        </button>
+        <input type="checkbox" class="hidden" :value="'<?= $s['nisn'] ?>'" x-model="checkedSantri">
+
+        <!-- Info Santri -->
+        <div>
+          <h6 class="font-semibold text-gray-800"><?= $s['nama'] ?></h6>
+          <p class="text-gray-500 text-sm mt-1">
+            <span class="mr-2"><strong>NISN:</strong> <?= $s['nisn'] ?></span>
+            <span class="mr-2"><strong>Program:</strong> <?= $s['program'] ?></span>
+            <span class="mr-2"><strong>Jenjang:</strong> <?= $s['jenjang'] ?></span>
+            <span class="mr-2"><strong>Kelas:</strong> <?= $s['kelas'] ?></span>
+          </p>
+        </div>
+
+        <!-- Tombol Aksi Individual -->
+        <div class="flex space-x-2 mt-2">
+          <button class="flex-1 bg-white border border-blue-600 text-blue-600 px-2 py-1 rounded hover:bg-blue-600 hover:text-white transition"
+            @click.stop="editSantri('<?= $s['nisn'] ?>')">
+            <span class="material-symbols-outlined align-middle">edit</span> Edit
+          </button>
+          <button class="flex-1 bg-white border border-red-600 text-red-600 px-2 py-1 rounded hover:bg-red-600 hover:text-white transition"
+            @click.stop="keluarSantri('<?= $s['nisn'] ?>')">
+            <span class="material-symbols-outlined align-middle">logout</span> Keluar
+          </button>
+          <button class="flex-1 bg-white border border-green-600 text-green-600 px-2 py-1 rounded hover:bg-green-600 hover:text-white transition"
+            @click.stop="arsipSantri('<?= $s['nisn'] ?>')">
+            <span class="material-symbols-outlined align-middle">archive</span> Arsip
+          </button>
+        </div>
       </div>
-    </div>
     <?php endforeach; ?>
   </div>
 
-  <?php if(count($santri)===0): ?>
+  <?php if (count($santri) === 0): ?>
     <div class="bg-yellow-100 text-yellow-800 p-4 rounded mt-4">Tidak ada data santri ditemukan.</div>
   <?php endif; ?>
 
@@ -121,75 +121,89 @@
 </div>
 
 <script>
-function santriApp() {
-  return {
-    checkedSantri: [],
-    allChecked: false,
-    modalEditMasal: false,
-    massal: { program:'', kelas:'', jenjang:'' },
+  function santriApp() {
+    return {
+      checkedSantri: [],
+      allChecked: false,
+      modalEditMasal: false,
+      massal: {
+        program: '',
+        kelas: '',
+        jenjang: ''
+      },
 
-    toggleSantri(nisn) {
-      const index = this.checkedSantri.indexOf(nisn);
-      if(index === -1) this.checkedSantri.push(nisn);
-      else this.checkedSantri.splice(index, 1);
-      this.allChecked = this.checkedSantri.length === <?= count($santri) ?>;
-    },
+      toggleSantri(nisn) {
+        const index = this.checkedSantri.indexOf(nisn);
+        if (index === -1) this.checkedSantri.push(nisn);
+        else this.checkedSantri.splice(index, 1);
+        this.allChecked = this.checkedSantri.length === <?= count($santri) ?>;
+      },
 
-    toggleAll() {
-      if(this.allChecked) this.checkedSantri = <?= json_encode(array_column($santri,'nisn')) ?>;
-      else this.checkedSantri = [];
-    },
+      toggleAll() {
+        if (this.allChecked) this.checkedSantri = <?= json_encode(array_column($santri, 'nisn')) ?>;
+        else this.checkedSantri = [];
+      },
 
-    openModalEditMasal() {
-      this.modalEditMasal = true;
-    },
+      openModalEditMasal() {
+        this.modalEditMasal = true;
+      },
 
-    submitMassal() {
-      if(this.checkedSantri.length===0) return alert('Pilih santri terlebih dahulu.');
-      // contoh post via fetch
-      fetch('<?= base_url('Santri/updateMasal') ?>', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          ids: this.checkedSantri,
-          ...this.massal
-        })
-      }).then(res=>res.json()).then(res=>{
-        alert(res.msg);
-        if(res.status) location.reload();
-      });
-    },
-
-    editSantri(nisn) {
-      // ambil data via fetch & buka modal individual
-      alert('Buka modal edit santri: '+nisn);
-    },
-
-    keluarSantri(nisn) {
-      if(confirm('Yakin menandai santri keluar?')) {
-        fetch('<?= base_url('Santri/tandaiKeluar') ?>',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ nisn })
-        }).then(res=>res.json()).then(res=>{
+      submitMassal() {
+        if (this.checkedSantri.length === 0) return alert('Pilih santri terlebih dahulu.');
+        // contoh post via fetch
+        fetch('<?= base_url('Santri/updateMasal') ?>', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            ids: this.checkedSantri,
+            ...this.massal
+          })
+        }).then(res => res.json()).then(res => {
           alert(res.msg);
-          if(res.status) location.reload();
+          if (res.status) location.reload();
         });
-      }
-    },
+      },
 
-    arsipSantri(nisn) {
-      if(confirm('Yakin ingin mengarsipkan santri?')) {
-        fetch('<?= base_url('Santri/arsipMasal') ?>',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ ids:[nisn] })
-        }).then(res=>res.json()).then(res=>{
-          alert(res.msg);
-          if(res.status) location.reload();
-        });
+      editSantri(nisn) {
+        // ambil data via fetch & buka modal individual
+        alert('Buka modal edit santri: ' + nisn);
+      },
+
+      keluarSantri(nisn) {
+        if (confirm('Yakin menandai santri keluar?')) {
+          fetch('<?= base_url('Santri/tandaiKeluar') ?>', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              nisn
+            })
+          }).then(res => res.json()).then(res => {
+            alert(res.msg);
+            if (res.status) location.reload();
+          });
+        }
+      },
+
+      arsipSantri(nisn) {
+        if (confirm('Yakin ingin mengarsipkan santri?')) {
+          fetch('<?= base_url('Santri/arsipMasal') ?>', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              ids: [nisn]
+            })
+          }).then(res => res.json()).then(res => {
+            alert(res.msg);
+            if (res.status) location.reload();
+          });
+        }
       }
     }
   }
-}
 </script>
