@@ -18,6 +18,7 @@ writable/debugbar/
 writable/logs/
 writable/session/
 writable/uploads/
+system/
 
 # Tetap track file .gitignore di dalam writable/ subfolder
 !writable/cache/.gitignore
