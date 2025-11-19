@@ -56,7 +56,7 @@ $routes->group('', ['filter' => 'role:superadmin,ustadz'], function ($routes) {
     $routes->get('/Santri/psb', 'Santri::psb');
     $routes->get('/psb/getSantriById/(:any)', 'Santri::getPsbById/$1');
     $routes->get('/riwayat-alumni', 'Santri::alumni');
-//    $routes->get('/pendaftaran-observasi', 'Psb');
+    //    $routes->get('/pendaftaran-observasi', 'Psb');
     $routes->get('/pendaftaran-formulir', 'Psb::tambah');
     $routes->post('psb/filter', 'Psb::filter');
 
@@ -82,24 +82,24 @@ $routes->group('', ['filter' => 'role:superadmin'], function ($routes) {
     $routes->get('/pembayaran-alumni', 'Alumni::tambah');
     $routes->get('/pembayaran-psb', 'Psb::pembayaran');
     $routes->get('mutasi/download', 'Page::download_datapembayaran');
-$routes->get('tunggakan/download', 'Page::download');
-$routes->get('/keuangan/tunggakan', 'Page::tunggakan');
+    $routes->get('tunggakan/download', 'Page::download');
+    $routes->get('/keuangan/tunggakan', 'Page::tunggakan');
     $routes->get('/alumni/tunggakan', 'Alumni::tunggakan');
     $routes->get('/keuangan/transaksi', 'Page::transaksi');
     $routes->get('/keuangan/keterangan', 'Page::keterangan');
     $routes->get('/downloadpsb', 'Psb::laporanpsb');
     $routes->post('jadwal/reset', 'JadwalController::resetJadwal');
     $routes->get('laporan-pemasukan', 'Home::koran');
-$routes->get('laporan/downloadBulanan', 'Home::downloadBulanan');
-$routes->get('laporan/downloadHarian', 'Home::downloadHarian');
+    $routes->get('laporan/downloadBulanan', 'Home::downloadBulanan');
+    $routes->get('laporan/downloadHarian', 'Home::downloadHarian');
     $routes->get('/tunggakan-admin', 'Page::datatunggakanadmin');
     $routes->post('/tunggakan-admin', 'Page::datatunggakanadmin');
     $routes->post('tunggakan-admin/search', 'Page::cariTunggakanadmin');
-$routes->group('tunggakan-admin', function($routes) {
-    $routes->get('/', 'Page::datatunggakanadmin');
-    $routes->post('load/(:segment)', 'Page::load/$1'); // load santri/psb/alumni
-    $routes->post('update', 'Page::update');
-});
+    $routes->group('tunggakan-admin', function ($routes) {
+        $routes->get('/', 'Page::datatunggakanadmin');
+        $routes->post('load/(:segment)', 'Page::load/$1'); // load santri/psb/alumni
+        $routes->post('update', 'Page::update');
+    });
 
     $routes->post('/savealumni', 'Alumni::save');
     $routes->post('/cetakpsb', 'Psb::cetak');
@@ -125,7 +125,7 @@ $routes->group('tunggakan-admin', function($routes) {
     $routes->post('/closing(:num)', 'Psb::closing/$1');
     $routes->post('/pembayaran', 'Psb::pembayaran');
     // $routes->post('Santri/kurangiSPPMasal', 'Santri::kurangiSPPMasal');
-    
+
     // khusus kwitansi
     $routes->get('kwitansi/(:num)', 'Page::kwitansi_santri_aktif/$1');
     $routes->get('kwitansi-psb/(:num)', 'Page::kwitansi_santri_psb/$1');
@@ -189,7 +189,6 @@ $routes->group('jadwal', ['filter' => 'role:superadmin,kamad'], function ($route
 
     $routes->get('generate', 'JadwalController::generate');
     $routes->post('generate/proses', 'JadwalController::generateJadwal');
-
 });
 
 // ---------------- Validasi Kehadiran ----------------
@@ -198,5 +197,3 @@ $routes->group('validasi', ['filter' => 'role:superadmin,musrif'], function ($ro
     $routes->post('simpan', 'ValidasiController::simpan'); // Simpan hasil validasi
     $routes->get('jadwal/(:num)', 'ValidasiController::jadwalByHari/$1'); // Tampilkan jadwal per hari (id hari)
 });
-
-
