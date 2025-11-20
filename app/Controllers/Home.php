@@ -45,7 +45,7 @@ class Home extends BaseController
                 ->where("YEAR(tanggal) = $tahunini")
                 ->findAll(),
             "bulanini" => $resulSum
-                ->select("YEAR(tanggal) as tahun, ANY_VALUE(tanggal) as tanggal, SUM(saldomasuk) as sum")
+                ->select("YEAR(tanggal) as tahun, MAX(tanggal) as tanggal, SUM(saldomasuk) as sum")
                 ->where("month(tanggal) = month(CURRENT_DATE)")
                 ->where("YEAR(tanggal) = YEAR(CURRENT_DATE)")
                 // ->where("YEAR(tanggal) = $tahunini")
