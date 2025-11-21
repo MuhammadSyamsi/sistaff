@@ -11,7 +11,7 @@ class Home extends BaseController
 {
     public function index()
     {
-        return redirect()->to("/beranda");
+        return redirect()->to("/pembayaran-kewajiban");
     }
     public function beranda()
     {
