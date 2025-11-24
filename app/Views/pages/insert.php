@@ -52,6 +52,23 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
     </template>
   </div>
 
+  <!-- Action Buttons (Bayar / Edit) -->
+  <div x-show="showActionButtons" class="flex gap-2 mb-3">
+
+    <button
+      @click="bayar(selectedSantri)"
+      class="flex-1 bg-green-600 text-white px-4 py-2 rounded-xl">
+      Bayar
+    </button>
+
+    <button
+      @click="edit(selectedSantri)"
+      class="flex-1 bg-yellow-500 text-white px-4 py-2 rounded-xl">
+      Edit
+    </button>
+
+  </div>
+
   <!-- Input Box -->
   <div class="mt-3 flex flex-col gap-2 border-t pt-3 relative">
 
@@ -78,28 +95,103 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
 </div>
 
 <script>
+  const santriData = <?= json_encode($cari); ?>;
+
   function chatApp() {
     return {
       input: '',
       messages: [{
         id: 1,
         type: 'in',
-        text: 'Masukkan Nama Santri'
+        text: 'Masukkan Nama Santri',
+        showActionButtons: false,
+        selectedSantri: null,
+
+        bayar(s) {
+          this.messages.push({
+            id: Date.now(),
+            type: 'out',
+            text: "Bayar untuk " + s.nama
+          });
+
+          this.showActionButtons = false;
+        },
+
+        edit(s) {
+          this.messages.push({
+            id: Date.now(),
+            type: 'out',
+            text: "Edit data " + s.nama
+          });
+
+          this.showActionButtons = false;
+        },
+
       }],
       suggestions: [],
 
       sendMessage() {
         if (!this.input.trim()) return;
+
+        const text = this.input.trim();
+
+        // kirim pesan out
         this.messages.push({
           id: Date.now(),
           type: 'out',
-          text: this.input
+          text: text
         });
 
         this.input = '';
         this.suggestions = [];
-
         window.dispatchEvent(new CustomEvent('message-added'));
+
+        // cek apakah input cocok dengan nama santri
+        const match = santriData.find(s =>
+          s.nama.toLowerCase() === text.toLowerCase()
+        );
+
+        // --- BOT REPLY ---
+        setTimeout(() => {
+          if (match) {
+            // ubah data ke format teks rapi
+            const info =
+              "Nama : " + match.nama + ", " +
+              "Jenjang : " + match.jenjang + ", " +
+              "Kelas : " + match.kelas + ", " +
+              "DU : " + Number(match.du).toLocaleString('id-ID') + ", " +
+              "SPP : " + Number(match.spp).toLocaleString('id-ID') + ", " +
+              "Tunggakan SPP : " + Number(match.tunggakanspp).toLocaleString('id-ID') + ", " +
+              "Tunggakan DU 1 : " + Number(match.tunggakandu).toLocaleString('id-ID') + ", " +
+              "Tunggakan DU 2 : " + Number(match.tunggakandu2).toLocaleString('id-ID') + ", " +
+              "Tunggakan DU 3 : " + Number(match.tunggakandu3).toLocaleString('id-ID') +
+              ", " +
+              "Kontak Wali : " + match.kontak1;
+
+            this.messages.push({
+              id: Date.now(),
+              type: 'in',
+              text: info
+            });
+
+            // munculkan tombol Bayar + Edit
+            this.showActionButtons = true;
+            this.selectedSantri = match;
+
+          } else {
+            // TIDAK COCOK
+            this.messages.push({
+              id: Date.now(),
+              type: 'in',
+              text: 'Masukkan sesuai data yang ada'
+            });
+
+            this.showActionButtons = false;
+            this.selectedSantri = null;
+          }
+
+          window.dispatchEvent(new CustomEvent('message-added'));
+        }, 500);
       },
 
       scrollBottom() {
