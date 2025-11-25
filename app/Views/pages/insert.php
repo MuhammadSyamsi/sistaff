@@ -132,87 +132,73 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
 </div>
 
 <script>
+  // data dari PHP
   const santriData = <?= json_encode($cari); ?>;
+  const bank = <?= json_encode(array_column($cari, 'nama')); ?>;
 
   function chatApp() {
     return {
+      // state
       input: '',
       messages: [{
         id: 1,
         type: 'in',
-        text: 'Masukkan Nama Santri',
-        showActionButtons: false,
-        showPaymentButtons: false,
-        selectedSantri: null,
-
-        bayar(s) {
-          this.selectedSantri = s;
-          this.showPaymentButtons = true;
-          this.showActionButtons = false;
-        },
-
-        edit(s) {
-          this.messages.push({
-            id: Date.now(),
-            type: 'out',
-            text: "Edit data " + s.nama
-          });
-
-          this.showActionButtons = false;
-        },
-
-        pilihPembayaran(jenis) {
-          this.messages.push({
-            id: Date.now(),
-            type: 'out',
-            text: "Pembayaran " + jenis + " untuk " + this.selectedSantri.nama
-          });
-
-          this.showPaymentButtons = false;
-
-          window.dispatchEvent(new CustomEvent('message-added'));
-        }
-
+        text: 'Masukkan Nama Santri'
       }],
 
-      suggestions: [],
+      formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+      },
 
+      formBayar: [],
+      suggestions: [],
+      showActionButtons: false,
+      showPaymentButtons: false,
+      selectedSantri: null,
+
+      // helper format ribuan
+      format(n) {
+        if (n === null || n === undefined || n === '') return '0';
+        // pastikan angka valid sebelum format
+        const num = Number(n);
+        return Number.isNaN(num) ? n : num.toLocaleString('id-ID');
+      },
+
+      // ===== events / actions =====
       sendMessage() {
-        if (!this.input.trim()) return;
+        if (!this.input || !this.input.trim()) return;
 
         const text = this.input.trim();
 
-        // kirim pesan out
+        // push outgoing message
         this.messages.push({
           id: Date.now(),
           type: 'out',
           text: text
         });
 
+        // reset input + suggestions
         this.input = '';
         this.suggestions = [];
         window.dispatchEvent(new CustomEvent('message-added'));
 
-        // cek apakah input cocok dengan nama santri
-        const match = santriData.find(s =>
-          s.nama.toLowerCase() === text.toLowerCase()
-        );
+        // cari match (exact, case-insensitive)
+        const match = santriData.find(s => (s.nama || '').toLowerCase() === text.toLowerCase());
 
-        // --- BOT REPLY ---
+        // bot reply setelah delay singkat
         setTimeout(() => {
           if (match) {
             const info =
-              "Nama : " + match.nama + ", " +
-              "Jenjang : " + match.jenjang + ", " +
-              "Kelas : " + match.kelas + ", " +
-              "DU : " + Number(match.du).toLocaleString('id-ID') + ", " +
-              "SPP : " + Number(match.spp).toLocaleString('id-ID') + ", " +
-              "Tunggakan SPP : " + Number(match.tunggakanspp).toLocaleString('id-ID') + ", " +
-              "Tunggakan DU 1 : " + Number(match.tunggakandu).toLocaleString('id-ID') + ", " +
-              "Tunggakan DU 2 : " + Number(match.tunggakandu2).toLocaleString('id-ID') + ", " +
-              "Tunggakan DU 3 : " + Number(match.tunggakandu3).toLocaleString('id-ID') +
-              ", " +
-              "Kontak Wali : " + match.kontak1;
+              "Nama : " + (match.nama || '-') + " --- " +
+              "Jenjang : " + (match.jenjang || '-') + " --- " +
+              "Kelas : " + (match.kelas || '-') + " --- " +
+              "DU : " + this.format(match.du) + " --- " +
+              "SPP : " + this.format(match.spp) + " --- " +
+              "Tunggakan SPP : " + this.format(match.tunggakanspp) + " --- " +
+              "Tunggakan DU 1 : " + this.format(match.tunggakandu) + " --- " +
+              "Tunggakan DU 2 : " + this.format(match.tunggakandu2) + " --- " +
+              "Tunggakan DU 3 : " + this.format(match.tunggakandu3) + " --- " +
+              "Kontak Wali : " + (match.kontak1 || 'belum ada');
 
             this.messages.push({
               id: Date.now(),
@@ -220,12 +206,12 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
               text: info
             });
 
-            // munculkan tombol Bayar + Edit
+            // tampilkan tombol Bayar / Edit
             this.showActionButtons = true;
+            this.showPaymentButtons = false;
             this.selectedSantri = match;
 
           } else {
-            // TIDAK COCOK
             this.messages.push({
               id: Date.now(),
               type: 'in',
@@ -233,32 +219,102 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
             });
 
             this.showActionButtons = false;
+            this.showPaymentButtons = false;
             this.selectedSantri = null;
           }
 
           window.dispatchEvent(new CustomEvent('message-added'));
-        }, 500);
-      },
-
-      scrollBottom() {
-        this.$nextTick(() => {
-          this.$refs.chatBody.scrollTop = this.$refs.chatBody.scrollHeight;
-        });
-      },
-
-      checkSuggestions() {
-        const bank = <?= json_encode(array_column($cari, 'nama')); ?>;
-        if (this.input.length < 2) {
-          this.suggestions = [];
-          return;
-        }
-        this.suggestions = bank.filter(x => x.toLowerCase().includes(this.input.toLowerCase())).slice(0, 3);
+        }, 300);
       },
 
       applySuggestion(text) {
+        // langsung isi dan kirim pesan
         this.input = text;
         this.suggestions = [];
-        this.sendMessage();
+        // beri sedikit waktu supaya x-model ter-update sebelum dikirim
+        this.$nextTick(() => this.sendMessage());
+      },
+
+      checkSuggestions() {
+        if (!this.input || this.input.length < 2) {
+          this.suggestions = [];
+          return;
+        }
+        const q = this.input.toLowerCase().trim();
+        this.suggestions = bank
+          .filter(x => x && x.toLowerCase().includes(q))
+          .slice(0, 5);
+      },
+
+      // edit action
+      edit(s) {
+        // contoh: kirim pesan out atau bisa buka modal edit
+        this.messages.push({
+          id: Date.now(),
+          type: 'out',
+          text: "Edit data " + (s.nama || '')
+        });
+
+        // sembunyikan action buttons
+        this.showActionButtons = false;
+        this.showPaymentButtons = false;
+        this.selectedSantri = null;
+
+        window.dispatchEvent(new CustomEvent('message-added'));
+      },
+
+      // tampilkan opsi payment badge
+      bayar(s) {
+        this.selectedSantri = s;
+        this.showPaymentButtons = true;
+        this.showActionButtons = false;
+      },
+
+      // pilih salah satu badge pembayaran
+      pilihPembayaran(jenis) {
+        if (!this.selectedSantri) return;
+
+        // --- KHUSUS JENIS SPP ---
+        if (jenis === 'SPP') {
+          this.formBayar.push({
+            jenis: 'SPP',
+            nama: this.selectedSantri.nama,
+            spp: this.selectedSantri.spp
+          });
+
+          // BOT REPLY
+          this.messages.push({
+            id: Date.now() + 1,
+            type: 'in',
+            text: "Pembayaran " + this.selectedSantri.nama + "\n" + "Nama: " + this.selectedSantri.nama + "\n" +
+              "Nominal SPP: " + this.formatRupiah(this.selectedSantri.spp)
+          });
+        }
+
+        // --- JENIS PEMBAYARAN LAINNYA ---
+        else {
+          this.formBayar.push({
+            jenis: jenis,
+            nama: this.selectedSantri.nama
+          });
+
+          this.messages.push({
+            id: Date.now() + 1,
+            type: 'in',
+            text: "Input pembayaran " + jenis + " telah ditambahkan."
+          });
+        }
+
+        window.dispatchEvent(new CustomEvent('message-added'));
+      },
+
+      // scroll helper
+      scrollBottom() {
+        this.$nextTick(() => {
+          if (this.$refs && this.$refs.chatBody) {
+            this.$refs.chatBody.scrollTop = this.$refs.chatBody.scrollHeight;
+          }
+        });
       }
     };
   }
