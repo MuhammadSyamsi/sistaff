@@ -69,6 +69,43 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
 
   </div>
 
+  <!-- Payment Options -->
+  <div
+    x-show="showPaymentButtons"
+    class="flex flex-wrap gap-2 mb-3">
+
+    <button
+      @click="pilihPembayaran('SPP')"
+      class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+      Bayar SPP
+    </button>
+
+    <button
+      @click="pilihPembayaran('Daftar Ulang')"
+      class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+      Bayar Daftar Ulang
+    </button>
+
+    <button
+      @click="pilihPembayaran('Uang Saku')"
+      class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-medium">
+      Bayar Uang Saku
+    </button>
+
+    <button
+      @click="pilihPembayaran('Infaq')"
+      class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+      Bayar Infaq
+    </button>
+
+    <button
+      @click="pilihPembayaran('Lainnya')"
+      class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
+      Bayar Lainnya
+    </button>
+
+  </div>
+
   <!-- Input Box -->
   <div class="mt-3 flex flex-col gap-2 border-t pt-3 relative">
 
@@ -105,15 +142,12 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         type: 'in',
         text: 'Masukkan Nama Santri',
         showActionButtons: false,
+        showPaymentButtons: false,
         selectedSantri: null,
 
         bayar(s) {
-          this.messages.push({
-            id: Date.now(),
-            type: 'out',
-            text: "Bayar untuk " + s.nama
-          });
-
+          this.selectedSantri = s;
+          this.showPaymentButtons = true;
           this.showActionButtons = false;
         },
 
@@ -127,7 +161,20 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
           this.showActionButtons = false;
         },
 
+        pilihPembayaran(jenis) {
+          this.messages.push({
+            id: Date.now(),
+            type: 'out',
+            text: "Pembayaran " + jenis + " untuk " + this.selectedSantri.nama
+          });
+
+          this.showPaymentButtons = false;
+
+          window.dispatchEvent(new CustomEvent('message-added'));
+        }
+
       }],
+
       suggestions: [],
 
       sendMessage() {
@@ -154,7 +201,6 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         // --- BOT REPLY ---
         setTimeout(() => {
           if (match) {
-            // ubah data ke format teks rapi
             const info =
               "Nama : " + match.nama + ", " +
               "Jenjang : " + match.jenjang + ", " +
@@ -212,6 +258,7 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
       applySuggestion(text) {
         this.input = text;
         this.suggestions = [];
+        this.sendMessage();
       }
     };
   }
