@@ -189,10 +189,9 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         setTimeout(() => {
           if (match) {
             const info =
-              "Nama : " + (match.nama || '-') + " --- " +
-              "Jenjang : " + (match.jenjang || '-') + " --- " +
-              "Kelas : " + (match.kelas || '-') + " --- " +
-              "DU : " + this.format(match.du) + " --- " +
+              "Nama : " + (match.nama) + " --- " +
+              "Jenjang : " + (match.jenjang) + " --- " +
+              "Kelas : " + (match.kelas) + " --- " +
               "SPP : " + this.format(match.spp) + " --- " +
               "Tunggakan SPP : " + this.format(match.tunggakanspp) + " --- " +
               "Tunggakan DU 1 : " + this.format(match.tunggakandu) + " --- " +
@@ -243,7 +242,7 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         const q = this.input.toLowerCase().trim();
         this.suggestions = bank
           .filter(x => x && x.toLowerCase().includes(q))
-          .slice(0, 5);
+          .slice(0, 3);
       },
 
       // edit action
@@ -276,35 +275,90 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
 
         // --- KHUSUS JENIS SPP ---
         if (jenis === 'SPP') {
-          this.formBayar.push({
-            jenis: 'SPP',
-            nama: this.selectedSantri.nama,
-            spp: this.selectedSantri.spp
-          });
 
-          // BOT REPLY
-          this.messages.push({
-            id: Date.now() + 1,
-            type: 'in',
-            text: "Pembayaran " + this.selectedSantri.nama + "\n" + "Nama: " + this.selectedSantri.nama + "\n" +
-              "Nominal SPP: " + this.formatRupiah(this.selectedSantri.spp)
-          });
+          let existing = this.formBayar.find(x => x.jenis === 'SPP');
+
+          if (existing) {
+            existing.spp += Number(this.selectedSantri.spp);
+          } else {
+            this.formBayar.push({
+              jenis: 'SPP',
+              nama: this.selectedSantri.nama,
+              spp: Number(this.selectedSantri.spp)
+            });
+          }
+
+          var judul = "Pembayaran SPP : ";
+          var nilai = existing ? existing.spp : Number(this.selectedSantri.spp);
+
+          var tagReply = "reply_spp";
         }
 
-        // --- JENIS PEMBAYARAN LAINNYA ---
-        else {
-          this.formBayar.push({
-            jenis: jenis,
-            nama: this.selectedSantri.nama
-          });
 
-          this.messages.push({
-            id: Date.now() + 1,
-            type: 'in',
-            text: "Input pembayaran " + jenis + " telah ditambahkan."
-          });
+
+        // --- DAFTAR ULANG ---
+        else if (jenis === 'Daftar Ulang') {
+
+          const nilaiDU =
+            Number(this.selectedSantri.tunggakandu) +
+            Number(this.selectedSantri.tunggakandu2) +
+            Number(this.selectedSantri.tunggakandu3);
+
+          let existingDU = this.formBayar.find(x => x.jenis === 'Daftar Ulang');
+
+          if (existingDU) {
+            existingDU.nilai = nilaiDU; // tidak menambah
+          } else {
+            this.formBayar.push({
+              jenis: 'Daftar Ulang',
+              nama: this.selectedSantri.nama,
+              nilai: nilaiDU
+            });
+          }
+
+          var judul = "Pembayaran Daftar Ulang : ";
+          var nilai = nilaiDU;
+
+          var tagReply = "reply_du";
         }
 
+
+
+        // --- UANG SAKU ---
+        else if (jenis === 'Uang Saku') {
+
+          const nilaiSaku = 50000;
+
+          let existingSaku = this.formBayar.find(x => x.jenis === 'Uang Saku');
+
+          if (existingSaku) {
+            existingSaku.nilai = nilaiSaku; // tidak bertambah
+          } else {
+            this.formBayar.push({
+              jenis: 'Uang Saku',
+              nama: this.selectedSantri.nama,
+              nilai: nilaiSaku
+            });
+          }
+
+          var judul = "Pembayaran Uang Saku : ";
+          var nilai = nilaiSaku;
+
+          var tagReply = "reply_saku";
+        }
+
+
+
+        // --- Hapus reply chat lama ---
+        this.messages = this.messages.filter(m => m.tag !== tagReply);
+
+        // --- Hanya 1 reply messages.push ---
+        this.messages.push({
+          id: Date.now(),
+          type: 'in',
+          tag: tagReply,
+          text: judul + "\n" + this.formatRupiah(nilai)
+        });
         window.dispatchEvent(new CustomEvent('message-added'));
       },
 
