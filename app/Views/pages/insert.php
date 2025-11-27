@@ -13,6 +13,38 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
 
 <!-- Chat Area Container -->
 <div x-data="chatApp()" class="mt-0 flex flex-col h-[calc(100vh-120px)] w-full bg-white rounded-xl shadow p-4">
+
+  <!-- Modal Input Tanggal -->
+  <div
+    x-show="showTanggalModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+    <div class="bg-white w-full h-full p-6 flex flex-col justify-center">
+
+      <h2 class="text-xl font-bold text-center mb-4">
+        Pilih Tanggal Pembayaran
+      </h2>
+
+      <input
+        type="date"
+        x-model="tanggalBayar"
+        class="border w-full p-3 rounded-lg mb-4 text-lg">
+
+      <button
+        @click="simpanTanggal()"
+        class="w-full bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg text-lg">
+        Simpan
+      </button>
+
+      <button
+        @click="showTanggalModal=false"
+        class="w-full mt-3 bg-gray-400 hover:bg-gray-500 text-white p-3 rounded-lg text-lg">
+        Batal
+      </button>
+
+    </div>
+  </div>
+
   <!-- Header -->
   <div class=" flex items-center justify-between border-b pb-3 mb-3">
     <div class="flex items-center gap-3">
@@ -57,13 +89,13 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
 
     <button
       @click="bayar(selectedSantri)"
-      class="flex-1 bg-green-600 text-white px-4 py-2 rounded-xl">
+      class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm hover:bg-green-700 transition">
       Bayar
     </button>
 
     <button
       @click="edit(selectedSantri)"
-      class="flex-1 bg-yellow-500 text-white px-4 py-2 rounded-xl">
+      class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm hover:bg-yellow-600 transition">
       Edit
     </button>
 
@@ -132,13 +164,15 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
 </div>
 
 <script>
-  // data dari PHP
   const santriData = <?= json_encode($cari); ?>;
   const bank = <?= json_encode(array_column($cari, 'nama')); ?>;
 
   function chatApp() {
     return {
-      // state
+
+      /* ==========================
+          STATE
+      ========================== */
       input: '',
       messages: [{
         id: 1,
@@ -146,58 +180,114 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         text: 'Masukkan Nama Santri'
       }],
 
+      formBayar: [],
+      saldoMasuk: [],
+      suggestions: [],
+
+      showActionButtons: false,
+      showPaymentButtons: false,
+      showTanggalModal: false,
+
+      selectedSantri: null,
+      tanggalBayar: '',
+
+
+      /* ==========================
+          FORMATTER
+      ========================== */
       formatRupiah(angka) {
         return new Intl.NumberFormat('id-ID').format(angka);
       },
 
-      formBayar: [],
-      suggestions: [],
-      showActionButtons: false,
-      showPaymentButtons: false,
-      selectedSantri: null,
-
-      // helper format ribuan
       format(n) {
-        if (n === null || n === undefined || n === '') return '0';
-        // pastikan angka valid sebelum format
-        const num = Number(n);
-        return Number.isNaN(num) ? n : num.toLocaleString('id-ID');
+        const x = Number(n);
+        return isNaN(x) ? n : x.toLocaleString('id-ID');
       },
 
-      // ===== events / actions =====
+
+      /* ==========================
+          TANGGAL (MODAL)
+      ========================== */
+      simpanTanggal() {
+        if (!this.tanggalBayar) return;
+
+        // simpan tanggal ke array formBayar
+        this.formBayar.tanggal = this.tanggalBayar;
+
+        // pesan out (user)
+        this.messages.push({
+          id: Date.now(),
+          type: 'out',
+          text: "Tanggal Pembayaran: " + this.tanggalBayar
+        });
+
+        this.showTanggalModal = false;
+        this.showActionButtons = true;
+
+        window.dispatchEvent(new CustomEvent('message-added'));
+      },
+
+
+      /* ==========================
+          SUGGESTION NAMA
+      ========================== */
+      checkSuggestions() {
+        if (!this.input || this.input.length < 2) {
+          this.suggestions = [];
+          return;
+        }
+        const q = this.input.toLowerCase();
+        this.suggestions = bank
+          .filter(n => n && n.toLowerCase().includes(q))
+          .slice(0, 3);
+      },
+
+      applySuggestion(text) {
+        this.input = text;
+        this.suggestions = [];
+        this.$nextTick(() => this.sendMessage());
+      },
+
+
+      /* ==========================
+          PENGIRIMAN PESAN
+      ========================== */
       sendMessage() {
-        if (!this.input || !this.input.trim()) return;
+        if (!this.input.trim()) return;
 
-        const text = this.input.trim();
+        let text = this.input.trim();
 
-        // push outgoing message
         this.messages.push({
           id: Date.now(),
           type: 'out',
           text: text
         });
 
-        // reset input + suggestions
+        // reset
         this.input = '';
         this.suggestions = [];
+
         window.dispatchEvent(new CustomEvent('message-added'));
 
-        // cari match (exact, case-insensitive)
-        const match = santriData.find(s => (s.nama || '').toLowerCase() === text.toLowerCase());
+        // cari nama santri
+        const match = santriData.find(
+          s => (s.nama || '').toLowerCase() === text.toLowerCase()
+        );
 
-        // bot reply setelah delay singkat
         setTimeout(() => {
+
           if (match) {
+
             const info =
-              "Nama : " + (match.nama) + " --- " +
-              "Jenjang : " + (match.jenjang) + " --- " +
-              "Kelas : " + (match.kelas) + " --- " +
+              "Nama : " + match.nama + " --- " +
+              "Jenjang : " + match.jenjang + " --- " +
+              "Kelas : " + match.kelas + " --- " +
               "SPP : " + this.format(match.spp) + " --- " +
               "Tunggakan SPP : " + this.format(match.tunggakanspp) + " --- " +
               "Tunggakan DU 1 : " + this.format(match.tunggakandu) + " --- " +
               "Tunggakan DU 2 : " + this.format(match.tunggakandu2) + " --- " +
               "Tunggakan DU 3 : " + this.format(match.tunggakandu3) + " --- " +
-              "Kontak Wali : " + (match.kontak1 || 'belum ada');
+              "Kontak Wali : " + (match.kontak1 || 'belum ada') + " --- lakukan pembayaran";
 
             this.messages.push({
               id: Date.now(),
@@ -205,12 +295,13 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
               text: info
             });
 
-            // tampilkan tombol Bayar / Edit
-            this.showActionButtons = true;
-            this.showPaymentButtons = false;
             this.selectedSantri = match;
+            this.showTanggalModal = true;
+            this.showPaymentButtons = false;
+            this.showActionButtons = false;
 
           } else {
+
             this.messages.push({
               id: Date.now(),
               type: 'in',
@@ -226,35 +317,17 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         }, 300);
       },
 
-      applySuggestion(text) {
-        // langsung isi dan kirim pesan
-        this.input = text;
-        this.suggestions = [];
-        // beri sedikit waktu supaya x-model ter-update sebelum dikirim
-        this.$nextTick(() => this.sendMessage());
-      },
 
-      checkSuggestions() {
-        if (!this.input || this.input.length < 2) {
-          this.suggestions = [];
-          return;
-        }
-        const q = this.input.toLowerCase().trim();
-        this.suggestions = bank
-          .filter(x => x && x.toLowerCase().includes(q))
-          .slice(0, 3);
-      },
-
-      // edit action
+      /* ==========================
+          EDIT DATA
+      ========================== */
       edit(s) {
-        // contoh: kirim pesan out atau bisa buka modal edit
         this.messages.push({
           id: Date.now(),
           type: 'out',
-          text: "Edit data " + (s.nama || '')
+          text: "Edit data " + s.nama
         });
 
-        // sembunyikan action buttons
         this.showActionButtons = false;
         this.showPaymentButtons = false;
         this.selectedSantri = null;
@@ -262,20 +335,30 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         window.dispatchEvent(new CustomEvent('message-added'));
       },
 
-      // tampilkan opsi payment badge
+
+      /* ==========================
+          TOMBOL BAYAR
+      ========================== */
       bayar(s) {
         this.selectedSantri = s;
         this.showPaymentButtons = true;
         this.showActionButtons = false;
       },
 
-      // pilih salah satu badge pembayaran
+
+      /* ==========================
+          PILIH PEMBAYARAN
+      ========================== */
       pilihPembayaran(jenis) {
         if (!this.selectedSantri) return;
 
-        // --- KHUSUS JENIS SPP ---
-        if (jenis === 'SPP') {
+        let judul = "";
+        let nilai = 0;
+        let tagReply = "";
 
+
+        /* ---------- SPP ---------- */
+        if (jenis === 'SPP') {
           let existing = this.formBayar.find(x => x.jenis === 'SPP');
 
           if (existing) {
@@ -288,15 +371,13 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
             });
           }
 
-          var judul = "Pembayaran SPP : ";
-          var nilai = existing ? existing.spp : Number(this.selectedSantri.spp);
-
-          var tagReply = "reply_spp";
+          judul = "Pembayaran SPP : ";
+          nilai = existing ? existing.spp : Number(this.selectedSantri.spp);
+          tagReply = "reply_spp";
         }
 
 
-
-        // --- DAFTAR ULANG ---
+        /* ---------- DAFTAR ULANG ---------- */
         else if (jenis === 'Daftar Ulang') {
 
           const nilaiDU =
@@ -304,10 +385,10 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
             Number(this.selectedSantri.tunggakandu2) +
             Number(this.selectedSantri.tunggakandu3);
 
-          let existingDU = this.formBayar.find(x => x.jenis === 'Daftar Ulang');
+          let existing = this.formBayar.find(x => x.jenis === 'Daftar Ulang');
 
-          if (existingDU) {
-            existingDU.nilai = nilaiDU; // tidak menambah
+          if (existing) {
+            existing.nilai = nilaiDU; // tetap 1
           } else {
             this.formBayar.push({
               jenis: 'Daftar Ulang',
@@ -316,23 +397,21 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
             });
           }
 
-          var judul = "Pembayaran Daftar Ulang : ";
-          var nilai = nilaiDU;
-
-          var tagReply = "reply_du";
+          judul = "Pembayaran Daftar Ulang : ";
+          nilai = nilaiDU;
+          tagReply = "reply_du";
         }
 
 
-
-        // --- UANG SAKU ---
+        /* ---------- UANG SAKU ---------- */
         else if (jenis === 'Uang Saku') {
 
           const nilaiSaku = 50000;
 
-          let existingSaku = this.formBayar.find(x => x.jenis === 'Uang Saku');
+          let existing = this.formBayar.find(x => x.jenis === 'Uang Saku');
 
-          if (existingSaku) {
-            existingSaku.nilai = nilaiSaku; // tidak bertambah
+          if (existing) {
+            existing.nilai = nilaiSaku;
           } else {
             this.formBayar.push({
               jenis: 'Uang Saku',
@@ -341,35 +420,40 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
             });
           }
 
-          var judul = "Pembayaran Uang Saku : ";
-          var nilai = nilaiSaku;
-
-          var tagReply = "reply_saku";
+          judul = "Pembayaran Uang Saku : ";
+          nilai = nilaiSaku;
+          tagReply = "reply_saku";
         }
 
 
-
-        // --- Hapus reply chat lama ---
+        /* ==========================
+            HAPUS REPLY LAMA & PUSH BARU
+        ========================== */
         this.messages = this.messages.filter(m => m.tag !== tagReply);
 
-        // --- Hanya 1 reply messages.push ---
         this.messages.push({
           id: Date.now(),
           type: 'in',
           tag: tagReply,
           text: judul + "\n" + this.formatRupiah(nilai)
         });
+
         window.dispatchEvent(new CustomEvent('message-added'));
       },
 
-      // scroll helper
+
+      /* ==========================
+          AUTO SCROLL CHAT
+      ========================== */
       scrollBottom() {
         this.$nextTick(() => {
-          if (this.$refs && this.$refs.chatBody) {
-            this.$refs.chatBody.scrollTop = this.$refs.chatBody.scrollHeight;
+          if (this.$refs.chatBody) {
+            this.$refs.chatBody.scrollTop =
+              this.$refs.chatBody.scrollHeight;
           }
         });
       }
+
     };
   }
 </script>
