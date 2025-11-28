@@ -49,8 +49,31 @@
                             <div class="min-w-full h-full bg-green-500 text-white p-4 snap-center flex flex-col justify-center">
                                 <p class="text-sm font-semibold truncate">Pemasukan Bulan Ini</p>
                                 <p class="text-3xl font-black leading-none">
-                                    Rp <?= number_format($pemasukan ?? 0, 0, ',', '.') ?>
+                                    Rp <?= number_format($total ?? 0, 0, ',', '.') ?>
                                 </p>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <p class="inline-flex items-center w-fit bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                        BSI : Rp <?= number_format($rekening['BSI'] ?? 0, 0, ',', '.') ?>
+                                    </p>
+                                    <p class="inline-flex items-center w-fit bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                        Jatim Syariah : Rp <?= number_format($rekening['Jatim Syariah'] ?? 0, 0, ',', '.') ?>
+                                    </p>
+                                    <p class="inline-flex items-center w-fit bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                        Muamalat Salam : Rp <?= number_format($rekening['Muamalat Salam'] ?? 0, 0, ',', '.') ?>
+                                    </p>
+                                    <p class="inline-flex items-center w-fit bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                        Muamalat Yatim : Rp <?= number_format($rekening['Muamalat Yatim'] ?? 0, 0, ',', '.') ?>
+                                    </p>
+                                    <p class="inline-flex items-center w-fit bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                        Tunai : Rp <?= number_format($rekening['tunai'] ?? 0, 0, ',', '.') ?>
+                                    </p>
+                                    <p class="inline-flex items-center w-fit bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                        Saku : Rp <?= number_format($rekening['uangsaku'] ?? 0, 0, ',', '.') ?>
+                                    </p>
+                                    <p class="inline-flex items-center w-fit bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                        Lain-lain : Rp <?= number_format($rekening['lain-lain'] ?? 0, 0, ',', '.') ?>
+                                    </p>
+                                </div>
                             </div>
 
                             <!-- Slide 2 -->

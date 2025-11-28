@@ -53,7 +53,41 @@ class Page extends BaseController
   {
 
     $cariNama = new SantriModel();
-    $data['cari'] = $cariNama->findAll();
+    $infoModel = new DetailModel();
+    $info = $infoModel
+      ->selectSum('spp')
+      ->selectSum('daftarulang')
+      ->selectSum('tunggakan')
+      ->selectSum('uangsaku')
+      ->selectSum('infaq')
+      ->selectSum('formulir')
+      ->select('rekening')
+      ->groupBy('rekening')
+      ->where('MONTH(tanggal)', date('m'))
+      ->where('YEAR(tanggal)', date('Y'))
+      ->findAll();
+
+    $rekening = [];
+
+    foreach ($info as $row) {
+      $rekening[$row['rekening']] =
+        ($row['spp'] ?? 0) +
+        ($row['daftarulang'] ?? 0) +
+        ($row['tunggakan'] ?? 0) +
+        ($row['uangsaku'] ?? 0) +
+        ($row['infaq'] ?? 0) +
+        ($row['formulir'] ?? 0);
+    }
+
+    // Jumlahkan semua nilai
+    $total = array_sum($rekening);
+
+    $data = [
+      'cari'  => $cariNama->findAll(),
+      'info'  => $info,
+      'rekening' => $rekening,
+      'total' => $total
+    ];
     $santri = $cariNama->findAll();
 
     return view('pages/insert', $data);
