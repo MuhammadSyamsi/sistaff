@@ -69,14 +69,14 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         <div x-show="msg.type === 'in'" class="flex items-start gap-2">
           <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm">A</div>
           <div>
-            <div class="bg-gray-100 px-4 py-2 rounded-2xl rounded-tl-none max-w-xs" x-text="msg.text"></div>
+            <div class="bg-gray-100 px-4 py-2 rounded-2xl rounded-tl-none max-w-xs whitespace-pre-line" x-text="msg.text"></div>
           </div>
         </div>
 
         <!-- Outgoing -->
         <div x-show="msg.type === 'out'" class="flex items-end justify-end gap-2">
           <div>
-            <div class="bg-blue-600 text-white px-4 py-2 rounded-2xl rounded-tr-none max-w-xs" x-text="msg.text"></div>
+            <div class="bg-blue-600 text-white px-4 py-2 rounded-2xl rounded-tr-none max-w-xs bubble whitespace-pre-line" x-text="msg.text"></div>
           </div>
           <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm">S</div>
         </div>
@@ -84,20 +84,19 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
     </template>
   </div>
 
-  <!-- Action Buttons (Bayar / Edit) -->
-  <div x-show="showActionButtons" class="flex gap-2 mb-3">
+  <!-- Rekening Options -->
+  <div x-show="showRekeningButtons" class="flex gap-2 flex-wrap mb-3">
 
-    <button
-      @click="bayar(selectedSantri)"
-      class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm hover:bg-green-700 transition">
-      Bayar
-    </button>
-
-    <button
-      @click="edit(selectedSantri)"
-      class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm hover:bg-yellow-600 transition">
-      Edit
-    </button>
+    <template x-for="rek in ['Jatim Syariah', 'Muamalat Salam', 'BSI', 'Muamalat Yatim', 'Tunai', 'Uang Saku', 'Lain-lain']">
+      <button
+        @click="pilihRekening(rek)"
+        :class="formBayar.rekening === rek ?
+         'bg-blue-600 text-white' :
+         'bg-gray-200 text-gray-700'"
+        class="px-3 py-1 rounded-full text-sm font-medium">
+        <span x-text="rek"></span>
+      </button>
+    </template>
 
   </div>
 
@@ -138,6 +137,23 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
 
   </div>
 
+  <!-- Action Buttons (Bayar / Edit) -->
+  <div x-show="showActionButtons" class="flex gap-2 mb-3">
+
+    <button
+      @click="bayar(selectedSantri)"
+      class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm hover:bg-green-700 transition">
+      Bayar
+    </button>
+
+    <button
+      @click="edit(selectedSantri)"
+      class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm hover:bg-yellow-600 transition">
+      Edit
+    </button>
+
+  </div>
+
   <!-- Input Box -->
   <div class="mt-3 flex flex-col gap-2 border-t pt-3 relative">
 
@@ -170,9 +186,7 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
   function chatApp() {
     return {
 
-      /* ==========================
-          STATE
-      ========================== */
+      /* STATE */
       input: '',
       messages: [{
         id: 1,
@@ -180,21 +194,47 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         text: 'Masukkan Nama Santri'
       }],
 
-      formBayar: [],
-      saldoMasuk: [],
+      formBayar: {
+        nama: '',
+        tanggal: '',
+        rekening: '',
+        keterangan: '',
+        saldomasuk: [],
+        detail: []
+      },
+
+      saldoMasuk: {
+        spp: 0,
+        du: 0,
+        tunggakan: 0,
+        saku: 0,
+        infaq: 0,
+        formulir: 0
+      },
       suggestions: [],
 
       showActionButtons: false,
       showPaymentButtons: false,
       showTanggalModal: false,
+      showRekeningButtons: false,
 
       selectedSantri: null,
       tanggalBayar: '',
 
+      pilihRekening(rek) {
+        this.formBayar.rekening = rek;
 
-      /* ==========================
-          FORMATTER
-      ========================== */
+        this.messages.push({
+          id: Date.now(),
+          type: 'out',
+          text: "Rekening: " + rek
+        });
+
+        this.showPaymentButtons = true;
+        this.showRekeningButtons = false; // lanjut ke menu bayar
+      },
+
+      /* FORMATTER */
       formatRupiah(angka) {
         return new Intl.NumberFormat('id-ID').format(angka);
       },
@@ -204,10 +244,7 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         return isNaN(x) ? n : x.toLocaleString('id-ID');
       },
 
-
-      /* ==========================
-          TANGGAL (MODAL)
-      ========================== */
+      /* TANGGAL (MODAL) */
       simpanTanggal() {
         if (!this.tanggalBayar) return;
 
@@ -222,15 +259,12 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
         });
 
         this.showTanggalModal = false;
-        this.showActionButtons = true;
+        this.showRekeningButtons = true;
 
         window.dispatchEvent(new CustomEvent('message-added'));
       },
 
-
-      /* ==========================
-          SUGGESTION NAMA
-      ========================== */
+      /* SUGGESTION NAMA */
       checkSuggestions() {
         if (!this.input || this.input.length < 2) {
           this.suggestions = [];
@@ -245,13 +279,11 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
       applySuggestion(text) {
         this.input = text;
         this.suggestions = [];
+        this.formBayar.nama = text;
         this.$nextTick(() => this.sendMessage());
       },
 
-
-      /* ==========================
-          PENGIRIMAN PESAN
-      ========================== */
+      /* PENGIRIMAN PESAN */
       sendMessage() {
         if (!this.input.trim()) return;
 
@@ -279,14 +311,14 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
           if (match) {
 
             const info =
-              "Nama : " + match.nama + " --- " +
-              "Jenjang : " + match.jenjang + " --- " +
-              "Kelas : " + match.kelas + " --- " +
-              "SPP : " + this.format(match.spp) + " --- " +
-              "Tunggakan SPP : " + this.format(match.tunggakanspp) + " --- " +
-              "Tunggakan DU 1 : " + this.format(match.tunggakandu) + " --- " +
-              "Tunggakan DU 2 : " + this.format(match.tunggakandu2) + " --- " +
-              "Tunggakan DU 3 : " + this.format(match.tunggakandu3) + " --- " +
+              "Nama : " + match.nama + " \n " +
+              "Jenjang : " + match.jenjang + " \n " +
+              "Kelas : " + match.kelas + " \n " +
+              "SPP : " + this.format(match.spp) + " \n " +
+              "Tunggakan SPP : " + this.format(match.tunggakanspp) + " \n " +
+              "Tunggakan DU 1 : " + this.format(match.tunggakandu) + "\n " +
+              "Tunggakan DU 2 : " + this.format(match.tunggakandu2) + " \n " +
+              "Tunggakan DU 3 : " + this.format(match.tunggakandu3) + " \n " +
               "Kontak Wali : " + (match.kontak1 || 'belum ada') + " --- lakukan pembayaran";
 
             this.messages.push({
@@ -315,12 +347,16 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
 
           window.dispatchEvent(new CustomEvent('message-added'));
         }, 300);
+
+        if (this.isInputKeterangan) {
+          this.formBayar.keterangan = text;
+          console.log(formBayar);
+        }
+
       },
 
 
-      /* ==========================
-          EDIT DATA
-      ========================== */
+      /* EDIT DATA */
       edit(s) {
         this.messages.push({
           id: Date.now(),
@@ -336,9 +372,7 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
       },
 
 
-      /* ==========================
-          TOMBOL BAYAR
-      ========================== */
+      /* TOMBOL BAYAR */
       bayar(s) {
         this.selectedSantri = s;
         this.showPaymentButtons = true;
@@ -346,105 +380,106 @@ $i = ($id == null) ? 1 : ($id[0] + 1);
       },
 
 
-      /* ==========================
-          PILIH PEMBAYARAN
-      ========================== */
+      /* PILIH PEMBAYARAN */
       pilihPembayaran(jenis) {
         if (!this.selectedSantri) return;
 
-        let judul = "";
         let nilai = 0;
+        let judul = "";
         let tagReply = "";
+        let existing;
 
 
-        /* ---------- SPP ---------- */
+        /* ---------------- SPP ---------------- */
         if (jenis === 'SPP') {
-          let existing = this.formBayar.find(x => x.jenis === 'SPP');
 
-          if (existing) {
-            existing.spp += Number(this.selectedSantri.spp);
-          } else {
-            this.formBayar.push({
+          nilai = Number(this.selectedSantri.spp);
+          judul = "Pembayaran SPP : ";
+          tagReply = "reply_spp";
+
+          // simpan hanya sekali
+          existing = this.formBayar.detail.find(x => x.jenis === 'SPP');
+          if (!existing) {
+            this.formBayar.detail.push({
               jenis: 'SPP',
-              nama: this.selectedSantri.nama,
-              spp: Number(this.selectedSantri.spp)
+              nilai: nilai
             });
           }
 
-          judul = "Pembayaran SPP : ";
-          nilai = existing ? existing.spp : Number(this.selectedSantri.spp);
-          tagReply = "reply_spp";
+          this.saldoMasuk.spp = nilai;
         }
 
 
-        /* ---------- DAFTAR ULANG ---------- */
+        /* ------------- DAFTAR ULANG ------------- */
         else if (jenis === 'Daftar Ulang') {
 
-          const nilaiDU =
+          nilai =
             Number(this.selectedSantri.tunggakandu) +
             Number(this.selectedSantri.tunggakandu2) +
             Number(this.selectedSantri.tunggakandu3);
 
-          let existing = this.formBayar.find(x => x.jenis === 'Daftar Ulang');
+          judul = "Pembayaran Daftar Ulang : ";
+          tagReply = "reply_du";
 
-          if (existing) {
-            existing.nilai = nilaiDU; // tetap 1
-          } else {
-            this.formBayar.push({
+          existing = this.formBayar.detail.find(x => x.jenis === 'Daftar Ulang');
+          if (!existing) {
+            this.formBayar.detail.push({
               jenis: 'Daftar Ulang',
-              nama: this.selectedSantri.nama,
-              nilai: nilaiDU
+              nilai: nilai
             });
           }
 
-          judul = "Pembayaran Daftar Ulang : ";
-          nilai = nilaiDU;
-          tagReply = "reply_du";
+          this.saldoMasuk.du = nilai;
         }
 
 
-        /* ---------- UANG SAKU ---------- */
+        /* ------------- UANG SAKU ------------- */
         else if (jenis === 'Uang Saku') {
 
-          const nilaiSaku = 50000;
+          nilai = 50000;
+          judul = "Pembayaran Uang Saku : ";
+          tagReply = "reply_saku";
 
-          let existing = this.formBayar.find(x => x.jenis === 'Uang Saku');
-
-          if (existing) {
-            existing.nilai = nilaiSaku;
-          } else {
-            this.formBayar.push({
+          existing = this.formBayar.detail.find(x => x.jenis === 'Uang Saku');
+          if (!existing) {
+            this.formBayar.detail.push({
               jenis: 'Uang Saku',
-              nama: this.selectedSantri.nama,
-              nilai: nilaiSaku
+              nilai: nilai
             });
           }
 
-          judul = "Pembayaran Uang Saku : ";
-          nilai = nilaiSaku;
-          tagReply = "reply_saku";
+          this.saldoMasuk.saku = nilai;
         }
 
 
-        /* ==========================
-            HAPUS REPLY LAMA & PUSH BARU
-        ========================== */
+        /* ----- Hapus reply lama yg sama ----- */
         this.messages = this.messages.filter(m => m.tag !== tagReply);
 
+
+        /* ----- Push reply baru ----- */
         this.messages.push({
           id: Date.now(),
           type: 'in',
           tag: tagReply,
-          text: judul + "\n" + this.formatRupiah(nilai)
+          text: judul + this.formatRupiah(nilai)
         });
+
+
+
+        /* ---- Hitung total ---- */
+        this.formBayar.saldomasuk =
+          this.saldoMasuk.spp +
+          this.saldoMasuk.du +
+          this.saldoMasuk.saku +
+          this.saldoMasuk.tunggakan +
+          this.saldoMasuk.infaq +
+          this.saldoMasuk.formulir;
+
 
         window.dispatchEvent(new CustomEvent('message-added'));
       },
 
-
-      /* ==========================
-          AUTO SCROLL CHAT
-      ========================== */
+      /* AUTO SCROLL CHAT */
       scrollBottom() {
         this.$nextTick(() => {
           if (this.$refs.chatBody) {
